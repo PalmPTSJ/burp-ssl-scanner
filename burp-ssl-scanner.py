@@ -40,7 +40,8 @@ try:
 
     import connection_test
     import heartbleed_test
-
+    import ccs_test
+    
 except ImportError as e:
     print e
     print "Failed to load dependencies. This issue maybe caused by using an unstable Jython version."
@@ -128,19 +129,26 @@ class BurpExtender(IBurpExtender, ITab):
             if heartbleed_test.test_heartbleed(host,443,1) :
                 print("[CRITICAL] Heartbleed success (TLS 1.0)")
             else :
-                print("Heartbleed failed (TLS 1.0)")
+                print("Heartbleed not found (TLS 1.0)")
         elif offer_tls11 :
             if heartbleed_test.test_heartbleed(host,443,2) :
                 print("[CRITICAL] Heartbleed success (TLS 1.1)")
             else :
-                print("Heartbleed failed (TLS 1.1)")
+                print("Heartbleed not found (TLS 1.1)")
         elif offer_tls12 :
             if heartbleed_test.test_heartbleed(host,443,3) :
                 print("[CRITICAL] Heartbleed success (TLS 1.2)")
             else :
-                print("Heartbleed failed (TLS 1.2)")
+                print("Heartbleed not found (TLS 1.2)")
         else :
             print("TLS Not supported for testing Heartbleed")
+
+        # CCS
+        if ccs_test.test_ccs(host,443) :
+            print("[CRITICAL] CCS Injection")
+        else :
+            print("CCS Injection not found")
+
 
         print("Finished scanning")
 
