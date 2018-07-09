@@ -43,6 +43,8 @@ try:
     import connection_test
     import heartbleed_test
     import ccs_test
+    import fallback_test
+    import poodle_test
     
 except ImportError as e:
     print e
@@ -146,7 +148,6 @@ class BurpExtender(IBurpExtender, ITab):
         except:
             print("Something wrong")
         
-
         print("Finished scanning")
 
     def saveToFile(self):
