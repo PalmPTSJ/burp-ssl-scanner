@@ -33,7 +33,7 @@ def test_heartbleed(host, port, tlsVer) :
         s.close()
     except BaseException as e :
         s.close()
-        raise e
+        vuln = False
     return vuln
 
 def recvall(s, length, timeout=5):

@@ -42,6 +42,8 @@ try:
     import connection_test
     import heartbleed_test
     import ccs_test
+    import fallback_test
+    import poodle_test
     
 except ImportError as e:
     print e
@@ -167,7 +169,12 @@ class BurpExtender(IBurpExtender, ITab):
 
         ccs = ccs_test.CCSTest(res, host, 443)
         ccs.start()
-        
+
+        fallback = fallback_test.FallbackTest(res, host, 443)
+        fallback.start()
+
+        poodle = poodle_test.PoodleTest(res, host, 443)
+        poodle.start()
 
         print("Finished scanning")
 
