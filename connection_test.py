@@ -95,9 +95,7 @@ def test_tls11(host, port) :
     return False
 
 
-#tls12_hello = "16030100cb010000c70303be31a08b927439f043a8b5e5ebf8eb7cd60d4d467428a8c940b6722ca3ed95c9000064c030c02cc028c024c014c00a00a500a300a1009f006b006a006900680039003800370036009d003d0035c02fc02bc027c023c013c00900a400a200a0009e00670040003f003e0033003200310030009c003c002fc012c008001600130010000d000a00ff0100003a000b000403000102000a000a00080019001800170013000d0020001e060106020603050105020503040104020403030103020303020102020203"
 tls12_hello = "16030100eb010000e70303e8f61847df51d3dc09d1409805aafa42ee03ae41247f67788cae75ef4c917daa00006ec014c00a00390038003700360088008700860085c00fc005003500840095c013c0090033003200310030009a0099009800970045004400430042c00ec004002f0096004100070094c011c0070066c00cc002000500040092c012c008001600130010000dc00dc003000a009300ff020100004f000b000403000102000a003a0038000e000d0019001c000b000c001b00180009000a001a00160017000800060007001400150004000500120013000100020003000f0010001100230000000f000101"
-
 def test_tls12(host, port) :
     try :
         data = sendData(host, port, tls12_hello.decode('hex'))
@@ -109,27 +107,22 @@ def test_tls12(host, port) :
         pass
     return False
 
-'''
-if testModule() :
-    print("Test passed")
-else :
-    print("Test failed")
-'''
-'''
-80
-3e
-01
-0002
-0015
-0010
-0010
-010080
-020080
-060040
-040080
-0700c0
-080080
-050080
-61616161616161616161616161616161
-61616161616161616161616161616161
-'''
+
+class ConnectionTest :
+    def __init__(self, result, host, port) :
+        self._result = result
+        self._host = host
+        self._port = port
+    
+    def start(self) :
+        self._result.addResult('offer_ssl2',test_sslv2(self._host,self._port))
+        if self._result.getResult('offer_ssl2') :
+            self._result.addVulnerability('CRITICAL', 'SSLv2 offered')
+
+        self._result.addResult('offer_ssl3',test_sslv3(self._host,self._port))
+        if self._result.getResult('offer_ssl3') :
+            self._result.addVulnerability('HIGH', 'SSLv3 offered')
+            
+        self._result.addResult('offer_tls10',test_tls10(self._host,self._port))
+        self._result.addResult('offer_tls11',test_tls11(self._host,self._port))
+        self._result.addResult('offer_tls12',test_tls12(self._host,self._port))

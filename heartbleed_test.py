@@ -105,3 +105,23 @@ def parseresp(s):
         # Look for server hello done message.
         if typ == 22 and ord(pay[0]) == 0x0E:
             return ver
+
+class HeartbleedTest :
+    def __init__(self, result, host, port) :
+        self._result = result
+        self._host = host
+        self._port = port
+    
+    def start(self) :
+        if self._result.getResult('offer_tls12') :
+            self._result.addResult('heartbleed',test_heartbleed(self._host, self._port, 3))
+        elif self._result.getResult('offer_tls11') :
+            self._result.addResult('heartbleed',test_heartbleed(self._host, self._port, 3))
+        elif self._result.getResult('offer_tls10') :
+            self._result.addResult('heartbleed',test_heartbleed(self._host, self._port, 3))
+        else :
+            print("TLS Not supported for testing Heartbleed")
+            self._result.addResult('heartbleed',False)
+        
+        if self._result.getResult('heartbleed') :
+            self._result.addVulnerability('CRITICAL', 'Heartbleed')

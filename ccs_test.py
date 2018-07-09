@@ -439,3 +439,14 @@ def test_ccs(strHost,iPort):
         #showDisplay(displayMode,"No need to patch.")
 
 #print(test_ccs('student.eng.chula.ac.th',443))
+
+class CCSTest :
+    def __init__(self, result, host, port) :
+        self._result = result
+        self._host = host
+        self._port = port
+    
+    def start(self) :
+        self._result.addResult('ccs_injection',test_ccs(self._host,self._port))
+        if self._result.getResult('ccs_injection') :
+            self._result.addVulnerability('CRITICAL', 'CCS Injection')
