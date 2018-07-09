@@ -46,6 +46,7 @@ try:
     import fallback_test
     import poodle_test
     import sweet32_test
+    import drown_test
 
 except ImportError as e:
     print e
@@ -137,13 +138,13 @@ class BurpExtender(IBurpExtender, ITab):
             print("Start scanning "+host)
 
             res = result.Result()
-
+            
             con = connection_test.ConnectionTest(res, host, 443)
             con.start()
             
             heartbleed = heartbleed_test.HeartbleedTest(res, host, 443)
             heartbleed.start()
-
+            
             ccs = ccs_test.CCSTest(res, host, 443)
             ccs.start()
 
@@ -156,8 +157,12 @@ class BurpExtender(IBurpExtender, ITab):
             sweet32 = sweet32_test.Sweet32Test(res, host, 443)
             sweet32.start()
             
-        except:
-            print("Something wrong")
+            drown = drown_test.DrownTest(res, host, 443)
+            drown.start()
+
+        except BaseException as e:
+            print("Something wrong",e)
+            raise e
         
         print("Finished scanning")
 

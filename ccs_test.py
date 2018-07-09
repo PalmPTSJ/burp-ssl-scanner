@@ -327,7 +327,6 @@ def makeHello(strSSLVer):
 def test_ccs(strHost, iPort, strVer):
     strHello = makeHello(strVer)
     print("Testing CCS ",strVer)
-    strLogPre = "[%s] %s:%d" % (strVer,strHost,iPort)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         s.connect((strHost,iPort))
@@ -399,7 +398,7 @@ def test_ccs(strHost, iPort, strVer):
                 #showDisplay(displayMode,"Connection closed unexpectedly.")
                 fVuln=False
                 break
-            if (len(recv)>0):
+            if (recv != None and len(recv)>0):
                 strLastMessage = recv
                 if (ord(recv[0])==21):
                     fVuln = False
