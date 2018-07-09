@@ -44,7 +44,8 @@ try:
     import ccs_test
     import fallback_test
     import poodle_test
-    
+    import sweet32_test
+
 except ImportError as e:
     print e
     print "Failed to load dependencies. This issue maybe caused by using an unstable Jython version."
@@ -163,7 +164,7 @@ class BurpExtender(IBurpExtender, ITab):
 
         con = connection_test.ConnectionTest(res, host, 443)
         con.start()
-
+        
         heartbleed = heartbleed_test.HeartbleedTest(res, host, 443)
         heartbleed.start()
 
@@ -175,6 +176,9 @@ class BurpExtender(IBurpExtender, ITab):
 
         poodle = poodle_test.PoodleTest(res, host, 443)
         poodle.start()
+        
+        sweet32 = sweet32_test.Sweet32Test(res, host, 443)
+        sweet32.start()
 
         print("Finished scanning")
 

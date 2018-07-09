@@ -116,9 +116,9 @@ class HeartbleedTest :
         if self._result.getResult('offer_tls12') :
             self._result.addResult('heartbleed',test_heartbleed(self._host, self._port, 3))
         elif self._result.getResult('offer_tls11') :
-            self._result.addResult('heartbleed',test_heartbleed(self._host, self._port, 3))
+            self._result.addResult('heartbleed',test_heartbleed(self._host, self._port, 2))
         elif self._result.getResult('offer_tls10') :
-            self._result.addResult('heartbleed',test_heartbleed(self._host, self._port, 3))
+            self._result.addResult('heartbleed',test_heartbleed(self._host, self._port, 1))
         else :
             print("TLS Not supported for testing Heartbleed")
             self._result.addResult('heartbleed',False)

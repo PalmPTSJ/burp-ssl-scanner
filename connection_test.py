@@ -126,3 +126,9 @@ class ConnectionTest :
         self._result.addResult('offer_tls10',test_tls10(self._host,self._port))
         self._result.addResult('offer_tls11',test_tls11(self._host,self._port))
         self._result.addResult('offer_tls12',test_tls12(self._host,self._port))
+
+        if all([not self._result.getResult(proto) for proto in ['offer_ssl2','offer_ssl3','offer_tls10','offer_tls11','offer_tls12']]) :
+            print("Every protocols are not supported")
+            self._result.addResult('connectable',False)
+        else :
+            self._result.addResult('connectable',True)

@@ -2,7 +2,7 @@ import sys
 import socket
 import time
 import struct
-
+from util import isTLSVersionSupport
 #Module
 dSSL = {
     "SSLv3" : "\x03\x00",
@@ -323,122 +323,114 @@ def makeHello(strSSLVer):
     h+= "\x01\x00"
     return r+h
 
-def test_ccs(strHost,iPort):
-    iVulnCount = 0
-    for strVer in ["TLSv1.2","TLSv1.1","TLSv1","SSLv3"]:
-        strHello = makeHello(strVer)
-        print("Testing CCS ",strVer)
-        strLogPre = "[%s] %s:%d" % (strVer,strHost,iPort)
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            s.connect((strHost,iPort))
-            s.settimeout(5)
-        except:
-            #showDisplay(displayMode,"Failure connecting to %s:%d." % (strHost,iPort))
-            quit()
-        s.send(strHello)
-        #print("Sending %s Client Hello" % (strVer))
-        iCount = 0
-        fServerHello = False
-        fCert = False
-        fKex = False
-        fHelloDone = False
-        while iCount<5:
-            iCount += 1
-        try:
-            recv = s.recv(2048)
-        except:
-            continue
-        lstRecords = getSSLRecords(recv)
-        #print(lstRecords)
-        #strLogMessage = "iCount = %d; lstRecords = %s" % (iCount,lstRecords)
-        #log(2,strLogMessage)
-        #print(fServerHello,fCert)
-        if lstRecords != None and len(lstRecords) > 0:
-            for (iShakeProtocol,iType) in lstRecords:
-                #print(iShakeProtocol,iType)
-                if iShakeProtocol == 22:
-                    if iType == 2:
-                        fServerHello = True
-                    elif iType == 11:
-                        fCert = True
-                    elif iType == 12:
-                        fKex = True
-                    elif iType == 14:
-                        fHelloDone = True
-                if (fServerHello and fCert):
-                    break
-        else:
-            #log(2, "Handshake missing or invalid.  Aborting.")
-            continue
-        
-        if not (fServerHello and fCert):
-            pass
-            #showDisplay(displayMode," - [LOG] %s Invalid handshake." % (strLogPre))
-        elif len(recv)>0:
-            pass
-        #print("Received %d bytes. (%d)" % (len(recv),ord(recv[0])))
-        if ord(recv[0])==22:
-            iCount = 0
-            strChangeCipherSpec = "\x14"
-            strChangeCipherSpec += dSSL[strVer]
-            strChangeCipherSpec += "\x00\x01" # Len
-            strChangeCipherSpec += "\x01" # Payload CCS
-            #print("Sending Change Cipher Spec")
-            s.send(strChangeCipherSpec)
-            fVuln = True
-            strLastMessage = ""
-            while iCount < 5:
-                iCount += 1
-                s.settimeout(0.5)
-                try:
-                    recv = s.recv(2048)
-                except socket.timeout:
-                    #showDisplay(displayMode,"Timeout waiting for CCS reply.")
-                    continue
-                except socket.error:
-                    #showDisplay(displayMode,"Connection closed unexpectedly.")
-                    fVuln=False
-                    break
-                if (len(recv)>0):
-                    strLastMessage = recv
-                    if (ord(recv[0])==21):
-                        fVuln = False
-                        break
-            try:
-                if ord(strLastMessage[-7]) == 21: # Check if an alert was at the end of the last message.
-                    fVuln=False
-            except IndexError:
-                pass
-            if fVuln:
-                try:
-                    s.send('\x15' + dSSL[strVer] + '\x00\x02\x01\x00')
-                    f = s.recv(1024)
-                    if len(f) == 0:
-                        fVuln = False
-                except socket.error:
-                    fVuln = False
-            if fVuln:
-                #showDisplay(displayMode," - [LOG] %s %s:%d may allow early CCS" % (strVer,strHost,iPort))
-                iVulnCount += 1
-            else:
-                #showDisplay(displayMode," - [LOG] %s %s:%d rejected early CCS" % (strVer,strHost,iPort))
-                pass
-        else:
-            #showDisplay(displayMode," - [LOG] %s No response from %s:%d" % (strVer,strHost,iPort))
-            pass
-        try:
-            s.close()
-        except:
-            pass
-    if iVulnCount > 0:
-        #showDisplay(displayMode,"***This System Exhibits Potentially Vulnerable Behavior***\nIf this system is using OpenSSL, it should be upgraded.\nNote: This is an experimental detection script and does not definitively determine vulnerable server status.")
-        return True
-    else:
-        return False
-        #showDisplay(displayMode,"No need to patch.")
 
-#print(test_ccs('student.eng.chula.ac.th',443))
+def test_ccs(strHost, iPort, strVer):
+    strHello = makeHello(strVer)
+    print("Testing CCS ",strVer)
+    strLogPre = "[%s] %s:%d" % (strVer,strHost,iPort)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.connect((strHost,iPort))
+        s.settimeout(5)
+    except:
+        #showDisplay(displayMode,"Failure connecting to %s:%d." % (strHost,iPort))
+        return False
+    s.send(strHello)
+    #print("Sending %s Client Hello" % (strVer))
+    iCount = 0
+    fServerHello = False
+    fCert = False
+    fKex = False
+    fHelloDone = False
+    while iCount<5:
+        iCount += 1
+    try:
+        recv = s.recv(2048)
+    except:
+        return False
+    lstRecords = getSSLRecords(recv)
+    #print(lstRecords)
+    #strLogMessage = "iCount = %d; lstRecords = %s" % (iCount,lstRecords)
+    #log(2,strLogMessage)
+    #print(fServerHello,fCert)
+    if lstRecords != None and len(lstRecords) > 0:
+        for (iShakeProtocol,iType) in lstRecords:
+            #print(iShakeProtocol,iType)
+            if iShakeProtocol == 22:
+                if iType == 2:
+                    fServerHello = True
+                elif iType == 11:
+                    fCert = True
+                elif iType == 12:
+                    fKex = True
+                elif iType == 14:
+                    fHelloDone = True
+            if (fServerHello and fCert):
+                break
+    else:
+        #log(2, "Handshake missing or invalid.  Aborting.")
+        return False
+    
+    if not (fServerHello and fCert):
+        pass
+        #showDisplay(displayMode," - [LOG] %s Invalid handshake." % (strLogPre))
+    elif len(recv)>0:
+        pass
+    #print("Received %d bytes. (%d)" % (len(recv),ord(recv[0])))
+    if ord(recv[0])==22:
+        iCount = 0
+        strChangeCipherSpec = "\x14"
+        strChangeCipherSpec += dSSL[strVer]
+        strChangeCipherSpec += "\x00\x01" # Len
+        strChangeCipherSpec += "\x01" # Payload CCS
+        #print("Sending Change Cipher Spec")
+        s.send(strChangeCipherSpec)
+        fVuln = True
+        strLastMessage = ""
+        while iCount < 5:
+            iCount += 1
+            s.settimeout(0.5)
+            try:
+                recv = s.recv(2048)
+            except socket.timeout:
+                #showDisplay(displayMode,"Timeout waiting for CCS reply.")
+                continue
+            except socket.error:
+                #showDisplay(displayMode,"Connection closed unexpectedly.")
+                fVuln=False
+                break
+            if (len(recv)>0):
+                strLastMessage = recv
+                if (ord(recv[0])==21):
+                    fVuln = False
+                    break
+        try:
+            if ord(strLastMessage[-7]) == 21: # Check if an alert was at the end of the last message.
+                fVuln=False
+        except IndexError:
+            pass
+        if fVuln:
+            try:
+                s.send('\x15' + dSSL[strVer] + '\x00\x02\x01\x00')
+                f = s.recv(1024)
+                if len(f) == 0:
+                    fVuln = False
+            except socket.error:
+                fVuln = False
+        if fVuln:
+            #showDisplay(displayMode," - [LOG] %s %s:%d may allow early CCS" % (strVer,strHost,iPort))
+            return True
+        else:
+            #showDisplay(displayMode," - [LOG] %s %s:%d rejected early CCS" % (strVer,strHost,iPort))
+            pass
+    else:
+        #showDisplay(displayMode," - [LOG] %s No response from %s:%d" % (strVer,strHost,iPort))
+        pass
+    try:
+        s.close()
+    except:
+        pass
+    return False
 
 class CCSTest :
     def __init__(self, result, host, port) :
@@ -447,6 +439,12 @@ class CCSTest :
         self._port = port
     
     def start(self) :
-        self._result.addResult('ccs_injection',test_ccs(self._host,self._port))
+        vuln = False
+        for version in range(4) :
+            if isTLSVersionSupport(self._result, version) :
+                if test_ccs(self._host, self._port,["SSLv3","TLSv1","TLSv1.1","TLSv1.2"][version]) :
+                    vuln = True
+        self._result.addResult('ccs_injection',vuln)
+
         if self._result.getResult('ccs_injection') :
             self._result.addVulnerability('CRITICAL', 'CCS Injection')

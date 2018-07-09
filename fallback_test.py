@@ -21,7 +21,7 @@ class FallbackTest :
         self._port = port
     
     def start(self) :
-        protocol = filter(lambda x : self._result.getResult(x[0]), [('offer_tls12',3), ('offer_tls11',2), ('offer_tls10',1), ('offer_ssl3',0)])
+        protocol = list(filter(lambda x : self._result.getResult(x[0]), [('offer_tls12',3), ('offer_tls11',2), ('offer_tls10',1), ('offer_ssl3',0)]))
 
         if len(protocol) <= 1 :
             print("Unable to test: Available protocol count is <= 1")
