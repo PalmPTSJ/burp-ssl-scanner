@@ -3,6 +3,7 @@ try:
     from burp import IScannerCheck
     from burp import IExtensionStateListener
     from burp import ITab
+    from burp import IMessageEditor
     from burp import IContextMenuFactory
     from burp import IContextMenuInvocation
     from burp import IHttpRequestResponse
@@ -85,8 +86,34 @@ class BurpExtender(IBurpExtender, ITab):
         self.setupPanel.add(self.toggleButton)
 
         self._topPanel.add(self.setupPanel, BorderLayout.PAGE_START)
+        
+        # Status bar
+        self.crawlStatusPanel = JPanel(FlowLayout(FlowLayout.LEADING, 10, 10))
+
+        self.crawlStatusPanel.add(JLabel("Status: ", SwingConstants.LEFT))
+
+        self.crawlStatusLabel = JLabel("Ready to scan", SwingConstants.LEFT)
+        self.crawlStatusPanel.add(self.crawlStatusLabel)
+
+        self._topPanel.add(self.crawlStatusPanel, BorderLayout.LINE_START)
 
         self._splitpane.setTopComponent(self._topPanel)
+
+        # bottom panel 
+        self._bottomPanel = JPanel(BorderLayout(10, 10))
+        self._bottomPanel.setBorder(EmptyBorder(10, 0, 0, 0))
+
+        self.textEditorInstance = callbacks.createTextEditor()
+        self.textEditorInstance.setEditable(False)
+        initialText = 'Press "Start scanning" to get started'
+        self.textEditorInstance.setText(self._helpers.stringToBytes(initialText))
+        self._bottomPanel.add(self.textEditorInstance.getComponent(), BorderLayout.CENTER)
+
+        self.savePanel = JPanel(FlowLayout(FlowLayout.LEADING, 10, 10))
+        self.savePanel.add(JButton('Save to file', actionPerformed=self.saveToFile))
+        self._bottomPanel.add(self.savePanel, BorderLayout.PAGE_END)
+
+        self._splitpane.setBottomComponent(self._bottomPanel)
 
         callbacks.customizeUiComponent(self._splitpane)
 
@@ -103,87 +130,43 @@ class BurpExtender(IBurpExtender, ITab):
     def startScan(self, ev) :
 
         host = self.hostField.text
+        if(len(host) == 0):
+            return 
 
-        print("Start scanning "+host)
+        try:
+            print("Start scanning "+host)
 
-        '''
-        offer_ssl2, offer_ssl3, offer_tls10, offer_tls11, offer_tls12 = [False]*5
+            res = result.Result()
 
-        if(connection_test.test_sslv2(host,443)) :
-            offer_ssl2 = True
-            print "[CRITICAL] SSLv2 offered"
+            con = connection_test.ConnectionTest(res, host, 443)
+            con.start()
+            
+            heartbleed = heartbleed_test.HeartbleedTest(res, host, 443)
+            heartbleed.start()
 
-        if(connection_test.test_sslv3(host,443)) :
-            offer_ssl3 = True
-            print "[HIGH] SSLv3 offered"
+            ccs = ccs_test.CCSTest(res, host, 443)
+            ccs.start()
+
+            fallback = fallback_test.FallbackTest(res, host, 443)
+            fallback.start()
+
+            poodle = poodle_test.PoodleTest(res, host, 443)
+            poodle.start()
+            
+            sweet32 = sweet32_test.Sweet32Test(res, host, 443)
+            sweet32.start()
+            
+        except:
+            print("Something wrong")
         
-        if(connection_test.test_tls10(host,443)) :
-            offer_tls10 = True
-            print "TLSv1.0 offered"
-
-        if(connection_test.test_tls11(host,443)) :
-            offer_tls11 = True
-            print "TLSv1.1 offered"
-
-        if(connection_test.test_tls12(host,443)) :
-            offer_tls12 = True
-            print "TLSv1.2 offered"
-
-        # Heartbleed
-        if offer_tls12 :
-            if heartbleed_test.test_heartbleed(host,443,3) :
-                print("[CRITICAL] Heartbleed success (TLS 1.2)")
-            else :
-                print("Heartbleed not found (TLS 1.2)")
-        elif offer_tls11 :
-            if heartbleed_test.test_heartbleed(host,443,2) :
-                print("[CRITICAL] Heartbleed success (TLS 1.1)")
-            else :
-                print("Heartbleed not found (TLS 1.1)")
-        elif offer_tls10 :
-            if heartbleed_test.test_heartbleed(host,443,1) :
-                print("[CRITICAL] Heartbleed success (TLS 1.0)")
-            else :
-                print("Heartbleed not found (TLS 1.0)")
-        else :
-            print("TLS Not supported for testing Heartbleed")
-
-        # CCS
-        if ccs_test.test_ccs(host,443) :
-            print("[CRITICAL] CCS Injection")
-        else :
-            print("CCS Injection not found")
-
-        # Test for TLS_FALLBACK_SCSV
-
-        fallback_scsv_to_ssl3 = '160300009c010000980300b8cd74dbfed2e4c86f90d130f07421f8d33da498d35ca56370f88d51373c26b4000070c014c00a00390038003700360088008700860085c00fc005003500840095c013c0090033003200310030009a0099009800970045004400430042c00ec004002f0096004100070094c011c0070066c00cc002000500040092c012c008001600130010000dc00dc003000a009300ff5600020100'
-        '''
-
-
-        res = result.Result()
-
-        con = connection_test.ConnectionTest(res, host, 443)
-        con.start()
-        
-        heartbleed = heartbleed_test.HeartbleedTest(res, host, 443)
-        heartbleed.start()
-
-        ccs = ccs_test.CCSTest(res, host, 443)
-        ccs.start()
-
-        fallback = fallback_test.FallbackTest(res, host, 443)
-        fallback.start()
-
-        poodle = poodle_test.PoodleTest(res, host, 443)
-        poodle.start()
-        
-        sweet32 = sweet32_test.Sweet32Test(res, host, 443)
-        sweet32.start()
-
         print("Finished scanning")
+
+    def saveToFile(self):
+        print "Saved"
 
     def getTabCaption(self):
         return "SSL Scanner"
 
     def getUiComponent(self):
         return self._splitpane
+    
