@@ -47,7 +47,7 @@ try:
     import poodle_test
     import sweet32_test
     import drown_test
-
+    import freak_test
 except ImportError as e:
     print e
     print "Failed to load dependencies. This issue maybe caused by using an unstable Jython version."
@@ -159,6 +159,9 @@ class BurpExtender(IBurpExtender, ITab):
             
             drown = drown_test.DrownTest(res, host, 443)
             drown.start()
+            
+            freak = freak_test.FreakTest(res, host, 443)
+            freak.start()
 
         except BaseException as e:
             print("Something wrong",e)
