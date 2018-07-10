@@ -43,6 +43,8 @@ try:
     import drown_test
     import freak_test
     import lucky13_test
+    import crime_test
+    import breach_test
 
 except ImportError as e:
     print e
@@ -234,7 +236,21 @@ class BurpExtender(IBurpExtender, ITab):
             lucky13.start()
             lucky13ResultText = res.printResult('lucky13')
             updateResultText(lucky13ResultText)
+            
 
+            setScanStatusLabel("Checking for CRIME")
+            crime = crime_test.CrimeTest(res, host, 443)
+            crime.start()
+            crimeResultText = res.printResult('crime_tls')
+            updateResultText(crimeResultText)
+            
+            '''
+            setScanStatusLabel("Checking for BREACH")
+            breach = breach_test.BreachTest(res, host, 443)
+            breach.start(self._callbacks, self._helpers)
+            breachResultText = res.printResult('breach')
+            updateResultText(breachResultText)
+            '''
 
             updateResultText('Finished scanning')
         except BaseException as e :

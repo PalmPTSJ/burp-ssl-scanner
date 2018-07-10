@@ -20,7 +20,6 @@ def tryHandshake(host, port, hello) : # Handshake for SSLv3 - TLS 1.2
         if len(data)>5 and ord(data[0]) == 22 and ord(data[1]) == 3 and ord(data[5]) == 2 :
             return ord(data[2]) # Return handshake version
     except BaseException as e :
-        print e
         pass
     return -1 # Handshake failure
 
