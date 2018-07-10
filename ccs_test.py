@@ -2,7 +2,7 @@ import sys
 import socket
 import time
 import struct
-from util import isTLSVersionSupport
+from util import getSupportedTLSVersion, addNecessaryExtensionToHello
 #Module
 dSSL = {
     "SSLv3" : "\x03\x00",
@@ -334,7 +334,8 @@ def test_ccs(strHost, iPort, strVer):
     except:
         #showDisplay(displayMode,"Failure connecting to %s:%d." % (strHost,iPort))
         return False
-    s.send(strHello)
+
+    s.send(addNecessaryExtensionToHello(strHello.encode('hex'), strHost).decode('hex'))
     #print("Sending %s Client Hello" % (strVer))
     iCount = 0
     fServerHello = False
@@ -439,10 +440,9 @@ class CCSTest :
     
     def start(self) :
         vuln = False
-        for version in range(4) :
-            if isTLSVersionSupport(self._result, version) :
-                if test_ccs(self._host, self._port,["SSLv3","TLSv1","TLSv1.1","TLSv1.2"][version]) :
-                    vuln = True
+        for version in getSupportedTLSVersion(self._result) :
+            if test_ccs(self._host, self._port,["SSLv3","TLSv1","TLSv1.1","TLSv1.2"][version]) :
+                vuln = True
         self._result.addResult('ccs_injection',vuln)
 
         if self._result.getResult('ccs_injection') :

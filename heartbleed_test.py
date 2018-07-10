@@ -3,6 +3,7 @@ import socket
 import time
 import select
 import struct
+from util import addNecessaryExtensionToHello
 hbv10 = '1803010003014000'
 hbv11 = '1803020003014000'
 hbv12 = '1803030003014000'
@@ -15,11 +16,11 @@ def test_heartbleed(host, port, tlsVer) :
         s.connect((host, port))
         
         if tlsVer == 1 : # TLS v1.0
-            hello, hb = connection_test.tls10_hello, hbv10
+            hello, hb = addNecessaryExtensionToHello(connection_test.tls10_hello, host), hbv10
         elif tlsVer == 2 : # TLS v1.1
-            hello, hb = connection_test.tls11_hello, hbv11
+            hello, hb = addNecessaryExtensionToHello(connection_test.tls11_hello, host), hbv11
         elif tlsVer == 3 : # TLS v1.2
-            hello, hb = connection_test.tls12_hello, hbv12
+            hello, hb = addNecessaryExtensionToHello(connection_test.tls12_hello, host), hbv12
         else :
             print("TLS version not supported")
             return False

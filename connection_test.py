@@ -1,19 +1,6 @@
 import socket
 import os
-
-def sendData(host, port, data) :
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(3)
-    try :
-        s.connect((host, port))
-        
-        s.sendall(data)
-        rec = s.recv(1024*10)
-        s.close()
-    except BaseException as e :
-        s.close()
-        raise e
-    return rec
+from util import tryHandshake, modifyHelloVersion, addNecessaryExtensionToHello, sendData
 
 # SSLv2 spec
 # 0x80
@@ -58,54 +45,22 @@ def test_sslv2(host, port) :
 
 sslv3_hello = "160300009a0100009603001e8b85b1d11074f011e217aa486aef746511d0ac1320c9552e9d33bceaba64c500006ec014c00a00390038003700360088008700860085c00fc005003500840095c013c0090033003200310030009a0099009800970045004400430042c00ec004002f0096004100070094c011c0070066c00cc002000500040092c012c008001600130010000dc00dc003000a009300ff020100"
 def test_sslv3(host, port) :
-    try :
-        data = sendData(host, port, sslv3_hello.decode('hex'))
-        #print(data.encode('hex'))
-        if len(data)>5 and ord(data[0]) == 22 and ord(data[5]) == 2 :
-            # Received Handshake and Server Hello
-            return True
-    except :
-        pass
-    return False
+    return tryHandshake(host, port, addNecessaryExtensionToHello(sslv3_hello, host)) == 0
 
 
 tls10_hello = "16030100eb010000e703011e35618ca5aca589bb1b2e2e085a43613fcbdc199208fa5cb0499c793fa3d60100006ec014c00a00390038003700360088008700860085c00fc005003500840095c013c0090033003200310030009a0099009800970045004400430042c00ec004002f0096004100070094c011c0070066c00cc002000500040092c012c008001600130010000dc00dc003000a009300ff020100004f000b000403000102000a003a0038000e000d0019001c000b000c001b00180009000a001a00160017000800060007001400150004000500120013000100020003000f0010001100230000000f000101"
 def test_tls10(host, port) :
-    try :
-        data = sendData(host, port, tls10_hello.decode('hex'))
-        #print(data.encode('hex'))
-        if len(data)>5 and ord(data[0]) == 22 and ord(data[1]) == 3 and ord(data[2]) == 1 and ord(data[5]) == 2 :
-            # Received Handshake with version 03 01 and Hello
-            return True
-    except :
-        pass
-    return False
+    return tryHandshake(host, port, addNecessaryExtensionToHello(tls10_hello, host)) == 1
 
 
 tls11_hello = "16030100eb010000e70302e8f61847df51d3dc09d1409805aafa42ee03ae41247f67788cae75ef4c917daa00006ec014c00a00390038003700360088008700860085c00fc005003500840095c013c0090033003200310030009a0099009800970045004400430042c00ec004002f0096004100070094c011c0070066c00cc002000500040092c012c008001600130010000dc00dc003000a009300ff020100004f000b000403000102000a003a0038000e000d0019001c000b000c001b00180009000a001a00160017000800060007001400150004000500120013000100020003000f0010001100230000000f000101"
 def test_tls11(host, port) :
-    try :
-        data = sendData(host, port, tls11_hello.decode('hex'))
-        #print(data.encode('hex'))
-        if len(data)>5 and ord(data[0]) == 22 and ord(data[1]) == 3 and ord(data[2]) == 2 and ord(data[5]) == 2 :
-            # Received Handshake with version 03 02 and Hello
-            return True
-    except :
-        pass
-    return False
+    return tryHandshake(host, port, addNecessaryExtensionToHello(tls11_hello, host)) == 2
 
 
 tls12_hello = "16030100eb010000e70303e8f61847df51d3dc09d1409805aafa42ee03ae41247f67788cae75ef4c917daa00006ec014c00a00390038003700360088008700860085c00fc005003500840095c013c0090033003200310030009a0099009800970045004400430042c00ec004002f0096004100070094c011c0070066c00cc002000500040092c012c008001600130010000dc00dc003000a009300ff020100004f000b000403000102000a003a0038000e000d0019001c000b000c001b00180009000a001a00160017000800060007001400150004000500120013000100020003000f0010001100230000000f000101"
 def test_tls12(host, port) :
-    try :
-        data = sendData(host, port, tls12_hello.decode('hex'))
-        #print(data.encode('hex'))
-        if len(data)>5 and ord(data[0]) == 22 and ord(data[1]) == 3 and ord(data[2]) == 3 and ord(data[5]) == 2 :
-            # Received Handshake with version 03 03 and Hello
-            return True
-    except :
-        pass
-    return False
+     return tryHandshake(host, port, addNecessaryExtensionToHello(tls12_hello, host)) == 3
 
 
 class ConnectionTest :

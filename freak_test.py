@@ -1,5 +1,5 @@
 
-from util import tryHandshake, getHighestTLSVersion, modifyHelloVersion, isTLSVersionSupport
+from util import tryHandshake, getHighestTLSVersion, modifyHelloVersion, isTLSVersionSupport, addNecessaryExtensionToHello
 import connection_test
 
 freak_hello = '16030100920100008e030354511e7adeadbeef3133070000000000cfbd3904cc160a8503909f770433d4de00001400620061006400600014000e00080006000300ff010000510000001c001a00001773747564656e742e656e672e6368756c612e61632e74680023000033740000000d0020001e060106020603050105020503040104020403030103020303020102020203000f000101'
@@ -17,7 +17,7 @@ class FreakTest :
         vuln = False
         for ver in range(4) :
             if isTLSVersionSupport(self._result, ver) :
-                if tryHandshake(self._host, self._port, modifyHelloVersion(freak_hello, ver)) != -1 :
+                if tryHandshake(self._host, self._port, addNecessaryExtensionToHello(modifyHelloVersion(freak_hello, ver), self._host)) != -1 :
                     print("[FREAK] Handshake success with version ",ver)
                     vuln = True
         if self._result.getResult('offer_ssl2') :

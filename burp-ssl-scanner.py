@@ -153,7 +153,7 @@ class BurpExtender(IBurpExtender, ITab):
                                 ("Checking for supported SSL/TLS versions",)))
             con = connection_test.ConnectionTest(res, host, 443)
             con.start()
-
+            
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("Checking for Heartbleed",)))
@@ -165,7 +165,7 @@ class BurpExtender(IBurpExtender, ITab):
                                 ("Checking for CCS Injection",)))
             ccs = ccs_test.CCSTest(res, host, 443)
             ccs.start()
-
+            
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("Checking for TLS_FALLBACK_SCSV",)))
@@ -195,6 +195,7 @@ class BurpExtender(IBurpExtender, ITab):
                                 ("Checking for FREAK",)))
             freak = freak_test.FreakTest(res, host, 443)
             freak.start()
+            
 
         except BaseException as e :
             SwingUtilities.invokeLater(
