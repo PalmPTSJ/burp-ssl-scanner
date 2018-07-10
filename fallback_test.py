@@ -23,11 +23,11 @@ class FallbackTest :
 
         if len(protocol) <= 1 :
             print("Unable to test: Available protocol count is <= 1")
-            self._result.addResult('fallback_support',True)
+            self._result.addResult('fallback_support',False)
             return
 
         # Try connect to prot[1] (lower)
         self._result.addResult('fallback_support',not tryConnect(self._host, self._port, protocol[1][1]))
 
         if not self._result.getResult('fallback_support') :
-            self._result.addVulnerability('MEDIUM', 'FALLBACK_SCSV not supported')
+            self._result.addVulnerability('HIGH', 'FALLBACK_SCSV not supported')

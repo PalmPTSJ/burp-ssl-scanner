@@ -13,7 +13,8 @@ POSSIBLE_TESTS = {
     'drown': 'DROWN',
     'freak': 'FREAK',
     'lucky13' : 'LUCKY13',
-    'crime_tls' : 'CRIME (TLS)'
+    'crime_tls' : 'CRIME (TLS)',
+    'breach' : 'BREACH'
 }
 
 class Result :
