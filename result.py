@@ -1,3 +1,19 @@
+POSSIBLE_TESTS = {
+    'connectable': 'SSL/TLS Connection Test',
+    'offer_ssl2': 'Offer SSLv2',
+    'offer_ssl3': 'Offer SSLv3',
+    'offer_tls10': 'Offer TLS1.0',
+    'offer_tls11': 'Offer TLS1.1',
+    'offer_tls12': 'Offer TLS1.2',
+    'heartbleed': 'Heartbleed',
+    'ccs_injection': 'CCS Injection',
+    'fallback_support': 'TLS_FALLBACK_SCSV Support',
+    'poodle_ssl3': 'POODLE (SSLv3)',
+    'sweet32': 'SWEET32',
+    'drown': 'DROWN',
+    'freak': 'FREAK'
+}
+
 class Result :
     
     def __init__(self):
@@ -10,9 +26,11 @@ class Result :
         # Add to Burp issue
         pass
 
-    def printResult(self, fields) :
-        for field in fields :
-            print "%s %s" % (field, self._resultDict[field])
+    def printResult(self, field) :
+        try:
+            return "%s %s" % (POSSIBLE_TESTS[field], self.getResult(field))
+        except KeyError:
+            return "Test does not exist"
 
     def addResult(self, field, val) :
         print "%s %s" % (field, val)
@@ -25,6 +43,9 @@ class Result :
         return True
 
     def getResult(self, field) :
-        return self._resultDict[field]
+        try: 
+            return self._resultDict[field]
+        except KeyError:
+            return False
 
 

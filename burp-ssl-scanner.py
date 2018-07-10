@@ -104,8 +104,8 @@ class BurpExtender(IBurpExtender, ITab):
 
         self.textEditorInstance = callbacks.createTextEditor()
         self.textEditorInstance.setEditable(False)
-        initialText = 'Press "Start scanning" to get started.'
-        self.textEditorInstance.setText(self._helpers.stringToBytes(initialText))
+        self.initialText = 'Press "Start scanning" to get started.\nPlease note that TLS1.3 is still not supported by this extension.'
+        self.textEditorInstance.setText(self._helpers.stringToBytes(self.initialText))
         self._bottomPanel.add(self.textEditorInstance.getComponent(), BorderLayout.CENTER)
 
         self.savePanel = JPanel(FlowLayout(FlowLayout.LEADING, 10, 10))
@@ -136,14 +136,11 @@ class BurpExtender(IBurpExtender, ITab):
         self.scanningEvent.set()
         if(len(host) == 0):
             return 
-
-        # try:
+        self.textEditorInstance.setText(self._helpers.stringToBytes(self.initialText))
+        self.updateText("Scanning " + host)
         print("Start scanning "+host)
         self.scannerThread = Thread(target=self.scan, args=(host, ))
         self.scannerThread.start()
-
-        # except:
-        #     print("Something wrong")
 
     def scan(self, host):
         res = result.Result()
@@ -153,53 +150,82 @@ class BurpExtender(IBurpExtender, ITab):
                                 ("Checking for supported SSL/TLS versions",)))
             con = connection_test.ConnectionTest(res, host, 443)
             con.start()
+            conResultText = res.printResult('connectable') + \
+                '\n     ' + res.printResult('offer_ssl2') + \
+                '\n     ' + res.printResult('offer_ssl3') + \
+                '\n     ' + res.printResult('offer_tls10') + \
+                '\n     ' + res.printResult('offer_tls11') + \
+                '\n     ' + res.printResult('offer_tls12')
+            SwingUtilities.invokeLater(
+                ScannerRunnable(self.updateText, (conResultText, )))
 
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("Checking for Heartbleed",)))
             heartbleed = heartbleed_test.HeartbleedTest(res, host, 443)
             heartbleed.start()
+            heartbleedResultText = res.printResult('heartbleed')
+            SwingUtilities.invokeLater(
+                ScannerRunnable(self.updateText, (heartbleedResultText, )))
 
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("Checking for CCS Injection",)))
             ccs = ccs_test.CCSTest(res, host, 443)
             ccs.start()
+            ccsResultText = res.printResult('ccs_injection')
+            SwingUtilities.invokeLater(
+                ScannerRunnable(self.updateText, (ccsResultText, )))
 
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("Checking for TLS_FALLBACK_SCSV",)))
             fallback = fallback_test.FallbackTest(res, host, 443)
             fallback.start()
+            fallbackResultText = res.printResult('fallback_support')
+            SwingUtilities.invokeLater(
+                ScannerRunnable(self.updateText, (fallbackResultText, )))
 
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("Checking for POODLE (SSLv3)",)))
             poodle = poodle_test.PoodleTest(res, host, 443)
             poodle.start()
+            poodleResultText = res.printResult('poodle_ssl3')
+            SwingUtilities.invokeLater(
+                ScannerRunnable(self.updateText, (poodleResultText, )))
             
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("Checking for SWEET32",)))
             sweet32 = sweet32_test.Sweet32Test(res, host, 443)
             sweet32.start()
+            sweet32ResultText = res.printResult('sweet32')
+            SwingUtilities.invokeLater(
+                ScannerRunnable(self.updateText, (sweet32ResultText, )))
             
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("Checking for DROWN",)))
             drown = drown_test.DrownTest(res, host, 443)
             drown.start()
+            drownResultText = res.printResult('drown')
+            SwingUtilities.invokeLater(
+                ScannerRunnable(self.updateText, (drownResultText, )))
             
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("Checking for FREAK",)))
             freak = freak_test.FreakTest(res, host, 443)
             freak.start()
+            freakResultText = res.printResult('freak')
+            SwingUtilities.invokeLater(
+                ScannerRunnable(self.updateText, (freakResultText, )))
 
         except BaseException as e :
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
-                                ("An error occurred. Please refer to the errors tab for more information.",)))
+                                ("An error occurred. Please refer to the output/errors tab for more information.",)))
             time.sleep(1)
             print(e)
 
@@ -208,6 +234,11 @@ class BurpExtender(IBurpExtender, ITab):
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("Ready to scan",)))
         print("Finished scanning")
+
+    def updateText(self, stringToAppend):
+        currentText = self._helpers.bytesToString(self.textEditorInstance.getText())
+        currentText += ('\n' + stringToAppend)
+        self.textEditorInstance.setText(self._helpers.stringToBytes(currentText))
 
     def saveToFile(self, event):
         fileChooser = JFileChooser()
