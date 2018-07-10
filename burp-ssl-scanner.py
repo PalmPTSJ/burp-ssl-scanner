@@ -222,6 +222,8 @@ class BurpExtender(IBurpExtender, ITab):
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.updateText, (freakResultText, )))
 
+            SwingUtilities.invokeLater(
+                ScannerRunnable(self.updateText, ('Finished scanning', )))
         except BaseException as e :
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
