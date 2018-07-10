@@ -17,7 +17,7 @@ try:
     from javax.swing.border import EmptyBorder
     from javax.swing.table import AbstractTableModel
     from java.awt import (GridLayout, BorderLayout, FlowLayout, Dimension, Point)
-    from java.net import URL
+    from java.net import URL, MalformedURLException
     from java.util import ArrayList
 
     from threading import Thread, Event
@@ -137,14 +137,25 @@ class BurpExtender(IBurpExtender, ITab):
         host = self.hostField.text
         self.scanningEvent.set()
         if(len(host) == 0):
-            return 
-        self.textEditorInstance.setText(self._helpers.stringToBytes(self.initialText))
-        self.updateText("Scanning " + host)
-        print("Start scanning "+host)
-        self.scannerThread = Thread(target=self.scan, args=(host, ))
-        self.scannerThread.start()
+            return
+        if host.find("://") == -1:
+            host = "https://" + host 
+        try:
+            targetURL = URL(host)
+            if(targetURL.getPort() == -1):
+                targetURL = URL("https", targetURL.getHost(), 443, "/")
+            self.hostField.setEnabled(False)
+            self.toggleButton.setEnabled(False)
+            self.textEditorInstance.setText(self._helpers.stringToBytes(self.initialText))
+            self.updateText("Scanning %s:%d" % (targetURL.getHost(), targetURL.getPort()))
+            print("Scanning %s:%d" % (targetURL.getHost(), targetURL.getPort()))
+            self.scannerThread = Thread(target=self.scan, args=(targetURL.getHost(), targetURL.getPort(),))
+            self.scannerThread.start()
+        except BaseException as e:
+            print(e)
+            return
 
-    def scan(self, host):
+    def scan(self, host, port):
 
         def setScanStatusLabel(text) :
             SwingUtilities.invokeLater(
@@ -158,7 +169,7 @@ class BurpExtender(IBurpExtender, ITab):
         res = result.Result()
         try :
             setScanStatusLabel("Checking for supported SSL/TLS versions")
-            con = connection_test.ConnectionTest(res, host, 443)
+            con = connection_test.ConnectionTest(res, host, port)
             con.start()
             conResultText = res.printResult('connectable') + \
                 '\n     ' + res.printResult('offer_ssl2') + \
@@ -170,56 +181,56 @@ class BurpExtender(IBurpExtender, ITab):
 
             
             setScanStatusLabel("Checking for Heartbleed")
-            heartbleed = heartbleed_test.HeartbleedTest(res, host, 443)
+            heartbleed = heartbleed_test.HeartbleedTest(res, host, port)
             heartbleed.start()
             heartbleedResultText = res.printResult('heartbleed')
             updateResultText(heartbleedResultText)
 
 
             setScanStatusLabel("Checking for CCS Injection")
-            ccs = ccs_test.CCSTest(res, host, 443)
+            ccs = ccs_test.CCSTest(res, host, port)
             ccs.start()
             ccsResultText = res.printResult('ccs_injection')
             updateResultText(ccsResultText)
 
 
             setScanStatusLabel("Checking for TLS_FALLBACK_SCSV")
-            fallback = fallback_test.FallbackTest(res, host, 443)
+            fallback = fallback_test.FallbackTest(res, host, port)
             fallback.start()
             fallbackResultText = res.printResult('fallback_support')
             updateResultText(fallbackResultText)
 
 
             setScanStatusLabel("Checking for POODLE (SSLv3)")
-            poodle = poodle_test.PoodleTest(res, host, 443)
+            poodle = poodle_test.PoodleTest(res, host, port)
             poodle.start()
             poodleResultText = res.printResult('poodle_ssl3')
             updateResultText(poodleResultText)
             
 
             setScanStatusLabel("Checking for SWEET32")
-            sweet32 = sweet32_test.Sweet32Test(res, host, 443)
+            sweet32 = sweet32_test.Sweet32Test(res, host, port)
             sweet32.start()
             sweet32ResultText = res.printResult('sweet32')
             updateResultText(sweet32ResultText)
             
 
             setScanStatusLabel("Checking for DROWN")
-            drown = drown_test.DrownTest(res, host, 443)
+            drown = drown_test.DrownTest(res, host, port)
             drown.start()
             drownResultText = res.printResult('drown')
             updateResultText(drownResultText)
             
 
             setScanStatusLabel("Checking for FREAK")
-            freak = freak_test.FreakTest(res, host, 443)
+            freak = freak_test.FreakTest(res, host, port)
             freak.start()
             freakResultText = res.printResult('freak')
             updateResultText(freakResultText)
             
 
             setScanStatusLabel("Checking for LUCKY13")
-            lucky13 = lucky13_test.Lucky13Test(res, host, 443)
+            lucky13 = lucky13_test.Lucky13Test(res, host, port)
             lucky13.start()
             lucky13ResultText = res.printResult('lucky13')
             updateResultText(lucky13ResultText)
@@ -235,8 +246,12 @@ class BurpExtender(IBurpExtender, ITab):
 
         self.scanningEvent.clear()
         SwingUtilities.invokeLater(
-                ScannerRunnable(self.scanStatusLabel.setText, 
-                                ("Ready to scan",)))
+                ScannerRunnable(self.toggleButton.setEnabled, (True, ))
+        )
+        SwingUtilities.invokeLater(
+                ScannerRunnable(self.hostField.setEnabled, (True, ))
+        )
+        setScanStatusLabel("Ready to scan")
         print("Finished scanning")
 
     def updateText(self, stringToAppend):
