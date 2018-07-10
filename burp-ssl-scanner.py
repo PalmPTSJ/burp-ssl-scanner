@@ -239,7 +239,7 @@ class BurpExtender(IBurpExtender, ITab):
             
 
             setScanStatusLabel("Checking for CRIME")
-            crime = crime_test.CrimeTest(res, host, 443)
+            crime = crime_test.CrimeTest(res, host, port)
             crime.start()
             crimeResultText = res.printResult('crime_tls')
             updateResultText(crimeResultText)
