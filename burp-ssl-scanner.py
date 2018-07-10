@@ -25,26 +25,10 @@ try:
     import sys
     import os
     import socket
-    from java.lang import System
 
-    import re
-    import hashlib
-
-    import ssl
     import time
 
-    import result
-    import connection_test
-    import heartbleed_test
-    import ccs_test
-    import fallback_test
-    import poodle_test
-    import sweet32_test
-    import drown_test
-    import freak_test
-    import lucky13_test
-    import crime_test
-    import breach_test
+    from module import *
 
 except ImportError as e:
     print e
@@ -244,6 +228,21 @@ class BurpExtender(IBurpExtender, ITab):
             crimeResultText = res.printResult('crime_tls')
             updateResultText(crimeResultText)
             
+
+            setScanStatusLabel("Checking for Cipherlist")
+            cipher = cipher_test.CipherTest(res, host, port)
+            cipher.start()
+            cipherResultText = 'Available ciphers:' + \
+                '\n     ' + res.printResult('cipher_NULL') + \
+                '\n     ' + res.printResult('cipher_ANON') + \
+                '\n     ' + res.printResult('cipher_EXP') + \
+                '\n     ' + res.printResult('cipher_LOW') + \
+                '\n     ' + res.printResult('cipher_WEAK') + \
+                '\n     ' + res.printResult('cipher_3DES') + \
+                '\n     ' + res.printResult('cipher_HIGH') + \
+                '\n     ' + res.printResult('cipher_STRONG')
+            updateResultText(cipherResultText)
+
             '''
             setScanStatusLabel("Checking for BREACH")
             breach = breach_test.BreachTest(res, host, 443)

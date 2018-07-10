@@ -14,9 +14,16 @@ POSSIBLE_TESTS = {
     'freak': 'FREAK',
     'lucky13' : 'LUCKY13',
     'crime_tls' : 'CRIME (TLS)',
-    'breach' : 'BREACH'
+    'breach' : 'BREACH',
+    'cipher_NULL' : 'NULL Cipher',
+    'cipher_ANON' : 'ANON Cipher',
+    'cipher_EXP' : 'EXP Cipher',
+    'cipher_LOW' : 'LOW Cipher',
+    'cipher_WEAK' : 'WEAK Cipher',
+    'cipher_3DES' : '3DES Cipher',
+    'cipher_HIGH' : 'HIGH Cipher',
+    'cipher_STRONG' : 'STRONG Cipher'
 }
-
 class Result :
     
     def __init__(self):

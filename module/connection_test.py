@@ -12,7 +12,7 @@ from util import tryHandshake, modifyHelloVersion, addNecessaryExtensionToHello,
 # Challenge Length [2]
 # <FOREACH CIPHER SPEC>
 #   Cipher spec [3]
-# Challenge
+# Challenge / Session ID
 
 sslv2_hello = "803e0100020015001000100100800200800600400400800700c00800800500806161616161616161616161616161616161616161616161616161616161616161"
 def test_sslv2(host, port) :

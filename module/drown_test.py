@@ -1,5 +1,5 @@
 
-from util import tryHandshake, getHighestTLSVersion, modifyHelloVersion
+from util import tryHandshake, getHighestTLSVersion, modifyHelloVersion, sendData
 import connection_test
 
 class DrownTest :
@@ -12,7 +12,7 @@ class DrownTest :
         # Connect using SSLv2
         if self._result.getResult('offer_ssl2') :
             try :
-                data = connection_test.sendData(self._host, self._port, connection_test.sslv2_hello.decode('hex'))
+                data = sendData(self._host, self._port, connection_test.sslv2_hello.decode('hex'))
                 #print("DATA",data)
                 # Byte 10-11 = Cipher suite length
                 cipherLength = ord(data[9])*256 + ord(data[10])
