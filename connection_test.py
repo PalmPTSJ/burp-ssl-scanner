@@ -18,6 +18,10 @@ sslv2_hello = "803e0100020015001000100100800200800600400400800700c00800800500806
 def test_sslv2(host, port) :
     try :
         data = sendData(host, port, sslv2_hello.decode('hex'))
+        # If received alert (protocol_version 0x46 = 70) [15][0304][0002][02][46]
+        if ord(data[0] == 21) and ord(data[6]) == 70 :
+            return False
+
         if len(data) >= 3 and ord(data[2]) == 4 :
             # Received Server hello
             return True
