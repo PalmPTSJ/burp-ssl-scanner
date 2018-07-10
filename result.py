@@ -11,7 +11,8 @@ POSSIBLE_TESTS = {
     'poodle_ssl3': 'POODLE (SSLv3)',
     'sweet32': 'SWEET32',
     'drown': 'DROWN',
-    'freak': 'FREAK'
+    'freak': 'FREAK',
+    'lucky13' : 'LUCKY13'
 }
 
 class Result :

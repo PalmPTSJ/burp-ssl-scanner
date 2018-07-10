@@ -42,6 +42,8 @@ try:
     import sweet32_test
     import drown_test
     import freak_test
+    import lucky13_test
+
 except ImportError as e:
     print e
     print "Failed to load dependencies. This issue maybe caused by using an unstable Jython version."
@@ -143,11 +145,19 @@ class BurpExtender(IBurpExtender, ITab):
         self.scannerThread.start()
 
     def scan(self, host):
-        res = result.Result()
-        try :
+
+        def setScanStatusLabel(text) :
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
-                                ("Checking for supported SSL/TLS versions",)))
+                                (text,)))
+                                
+        def updateResultText(text) :
+            SwingUtilities.invokeLater(
+                ScannerRunnable(self.updateText, (text, )))
+
+        res = result.Result()
+        try :
+            setScanStatusLabel("Checking for supported SSL/TLS versions")
             con = connection_test.ConnectionTest(res, host, 443)
             con.start()
             conResultText = res.printResult('connectable') + \
@@ -156,74 +166,66 @@ class BurpExtender(IBurpExtender, ITab):
                 '\n     ' + res.printResult('offer_tls10') + \
                 '\n     ' + res.printResult('offer_tls11') + \
                 '\n     ' + res.printResult('offer_tls12')
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.updateText, (conResultText, )))
+            updateResultText(conResultText)
 
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.scanStatusLabel.setText, 
-                                ("Checking for Heartbleed",)))
+            
+            setScanStatusLabel("Checking for Heartbleed")
             heartbleed = heartbleed_test.HeartbleedTest(res, host, 443)
             heartbleed.start()
             heartbleedResultText = res.printResult('heartbleed')
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.updateText, (heartbleedResultText, )))
+            updateResultText(heartbleedResultText)
 
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.scanStatusLabel.setText, 
-                                ("Checking for CCS Injection",)))
+
+            setScanStatusLabel("Checking for CCS Injection")
             ccs = ccs_test.CCSTest(res, host, 443)
             ccs.start()
             ccsResultText = res.printResult('ccs_injection')
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.updateText, (ccsResultText, )))
+            updateResultText(ccsResultText)
 
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.scanStatusLabel.setText, 
-                                ("Checking for TLS_FALLBACK_SCSV",)))
+
+            setScanStatusLabel("Checking for TLS_FALLBACK_SCSV")
             fallback = fallback_test.FallbackTest(res, host, 443)
             fallback.start()
             fallbackResultText = res.printResult('fallback_support')
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.updateText, (fallbackResultText, )))
+            updateResultText(fallbackResultText)
 
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.scanStatusLabel.setText, 
-                                ("Checking for POODLE (SSLv3)",)))
+
+            setScanStatusLabel("Checking for POODLE (SSLv3)")
             poodle = poodle_test.PoodleTest(res, host, 443)
             poodle.start()
             poodleResultText = res.printResult('poodle_ssl3')
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.updateText, (poodleResultText, )))
+            updateResultText(poodleResultText)
             
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.scanStatusLabel.setText, 
-                                ("Checking for SWEET32",)))
+
+            setScanStatusLabel("Checking for SWEET32")
             sweet32 = sweet32_test.Sweet32Test(res, host, 443)
             sweet32.start()
             sweet32ResultText = res.printResult('sweet32')
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.updateText, (sweet32ResultText, )))
+            updateResultText(sweet32ResultText)
             
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.scanStatusLabel.setText, 
-                                ("Checking for DROWN",)))
+
+            setScanStatusLabel("Checking for DROWN")
             drown = drown_test.DrownTest(res, host, 443)
             drown.start()
             drownResultText = res.printResult('drown')
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.updateText, (drownResultText, )))
+            updateResultText(drownResultText)
             
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.scanStatusLabel.setText, 
-                                ("Checking for FREAK",)))
+
+            setScanStatusLabel("Checking for FREAK")
             freak = freak_test.FreakTest(res, host, 443)
             freak.start()
             freakResultText = res.printResult('freak')
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.updateText, (freakResultText, )))
+            updateResultText(freakResultText)
+            
 
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.updateText, ('Finished scanning', )))
+            setScanStatusLabel("Checking for LUCKY13")
+            lucky13 = lucky13_test.Lucky13Test(res, host, 443)
+            lucky13.start()
+            lucky13ResultText = res.printResult('lucky13')
+            updateResultText(lucky13ResultText)
+
+
+            updateResultText('Finished scanning')
         except BaseException as e :
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
