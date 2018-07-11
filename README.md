@@ -1,4 +1,5 @@
-# burp-ssl-scanner
+# Burp SSL Scanner
+
 Burp Suite plugin for scanning SSL vulnerabilities.
 
 ## Installing
@@ -22,4 +23,4 @@ Burp Suite plugin for scanning SSL vulnerabilities.
 
 ### Notes
 
-Most of the testing logic are from testssl.sh
+Most of the testing logic are from [testssl.sh](https://testssl.sh)
