@@ -26,14 +26,10 @@ They are as follows:
 
 POSSIBLE_TESTS = {
     'connectable': {
-        'internalType': 0
+        'internalType': 0,
         'name': 'SSL/TLS Connection Test',
         'result': ['Failed', 'Successful'],
         'type': 0x08000000,
-        'severity': 'Information',
-        'confidence': 'Certain',
-        'issueBackground': None,
-        'remediationBackground': None,
     },
     'offer_ssl2': {
         'name': 'Offer SSLv2',
