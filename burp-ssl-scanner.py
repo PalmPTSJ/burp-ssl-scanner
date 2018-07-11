@@ -139,14 +139,14 @@ class BurpExtender(IBurpExtender, ITab):
             self.textEditorInstance.setText(self._helpers.stringToBytes(self.initialText))
             self.updateText("Scanning %s:%d" % (targetURL.getHost(), targetURL.getPort()))
             print("Scanning %s:%d" % (targetURL.getHost(), targetURL.getPort()))
-            self.scannerThread = Thread(target=self.scan, args=(targetURL.getHost(), targetURL.getPort(),))
+            self.scannerThread = Thread(target=self.scan, args=(targetURL, ))
             self.scannerThread.start()
         except BaseException as e:
             self.saveButton.setEnabled(False)
             print(e)
             return
 
-    def scan(self, host, port):
+    def scan(self, url):
 
         def setScanStatusLabel(text) :
             SwingUtilities.invokeLater(
@@ -157,7 +157,10 @@ class BurpExtender(IBurpExtender, ITab):
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.updateText, (text, )))
 
-        res = result.Result()
+        res = result.Result(url, self._callbacks, self._helpers)
+
+        host, port = url.getHost(), url.getPort()
+
         try :
             setScanStatusLabel("Checking for supported SSL/TLS versions")
             con = connection_test.ConnectionTest(res, host, port)
@@ -169,6 +172,11 @@ class BurpExtender(IBurpExtender, ITab):
                 '\n     ' + res.printResult('offer_tls11') + \
                 '\n     ' + res.printResult('offer_tls12')
             updateResultText(conResultText)
+
+            
+            if not res.getResult('connectable') :
+                updateResultText("Scan terminated (Connection failed)")
+                raise BaseException('Connection failed')
 
             
             setScanStatusLabel("Checking for Heartbleed")
@@ -257,9 +265,9 @@ class BurpExtender(IBurpExtender, ITab):
             updateResultText(breachResultText)
             '''
 
-            updateResultText('Finished scanning\n\nSummary\n')
+            updateResultText('Finished scanning\n\n')
 
-            updateResultText('\n'.join(res.vulnerabilityList))
+            #updateResultText('\n'.join(res.vulnerabilityList))
 
         except BaseException as e :
             SwingUtilities.invokeLater(

@@ -6,11 +6,11 @@ from result import *
 class SSLIssue(IScanIssue):
     def __init__(self, issueKey, url, helpers):
         self.issueKey = issueKey
-        self.url = url
+        self._url = url
         self.helpers = helpers
     
     def getUrl(self):
-        return self.url
+        return self._url
 
     def getIssueInternalType(self):
         return POSSIBLE_TESTS[self.issueKey]['internalType']
@@ -34,22 +34,25 @@ class SSLIssue(IScanIssue):
         return POSSIBLE_TESTS[self.issueKey]['remediationBackground']
 
     def setIssueDetail(self, issueDetail):
-        self.issueDetail = issueDetail
+        self._issueDetail = issueDetail
 
     def getIssueDetail(self):
         try:
-            return self.issueDetail
+            return self._issueDetail
         except AttributeError:
             return None
 
     def setRemediationDetail(self, remediationDetail):
-        self.remediationDetail = remediationDetail
+        self._remediationDetail = remediationDetail
 
     def getRemediationDetail(self):
         try:
-            return self.remediationDetail
+            return self._remediationDetail
         except AttributeError:
             return None
 
+    def getHttpMessages(self) :
+        return []
+
     def getHttpService(self):
-        return self.helpers.buildHttpService(self.url.getHost(), self.url.getPort(), self.url.getProtocol())
+        return self.helpers.buildHttpService(self._url.getHost(), self._url.getPort(), self._url.getProtocol())

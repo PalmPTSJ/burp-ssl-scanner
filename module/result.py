@@ -1,18 +1,23 @@
 from test_details import *
-
+from ssl_issue_details import SSLIssue
+from java.lang import Runnable
+from javax.swing import SwingUtilities
 class Result :
     
-    def __init__(self):
+    def __init__(self, url, callbacks, helpers):
         self._resultDict = {}
-        self.vulnerabilityList = []
-        pass
+        self.url = url
+        self.callbacks = callbacks
+        self.helpers = helpers
 
-    def addVulnerability(self, severity, name) :
+    def addVulnerability(self, issueKey) :
         # print 
-        print "VULNERABILITY FOUND: [%s] %s" % (severity, name)
-        self.vulnerabilityList.append("[%s] %s" % (severity, name))
+        print "VULNERABILITY FOUND: [%s]" % (issueKey)
         # Add to Burp issue
-        pass
+        issue = SSLIssue(issueKey, self.url, self.helpers)
+        SwingUtilities.invokeLater(
+                ScannerRunnable(self.callbacks.addScanIssue, (issue, ))
+        )
 
     def printResult(self, field) :
         try:
@@ -37,3 +42,10 @@ class Result :
             return False
 
 
+class ScannerRunnable(Runnable):
+    def __init__(self, func, args):
+        self.func = func
+        self.args = args
+
+    def run(self):
+        self.func(*self.args)
