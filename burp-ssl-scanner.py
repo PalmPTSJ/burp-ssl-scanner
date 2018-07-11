@@ -97,7 +97,10 @@ class BurpExtender(IBurpExtender, ITab):
         self._bottomPanel.add(self.textEditorInstance.getComponent(), BorderLayout.CENTER)
 
         self.savePanel = JPanel(FlowLayout(FlowLayout.LEADING, 10, 10))
-        self.savePanel.add(JButton('Save to file', actionPerformed=self.saveToFile))
+        self.saveButton = JButton('Save to file', actionPerformed=self.saveToFile)
+        self.saveButton.setEnabled(False)
+        self.savePanel.add(self.saveButton)
+
         self._bottomPanel.add(self.savePanel, BorderLayout.PAGE_END)
 
         self._splitpane.setBottomComponent(self._bottomPanel)
@@ -132,12 +135,14 @@ class BurpExtender(IBurpExtender, ITab):
                 targetURL = URL("https", targetURL.getHost(), 443, "/")
             self.hostField.setEnabled(False)
             self.toggleButton.setEnabled(False)
+            self.saveButton.setEnabled(False)
             self.textEditorInstance.setText(self._helpers.stringToBytes(self.initialText))
             self.updateText("Scanning %s:%d" % (targetURL.getHost(), targetURL.getPort()))
             print("Scanning %s:%d" % (targetURL.getHost(), targetURL.getPort()))
             self.scannerThread = Thread(target=self.scan, args=(targetURL.getHost(), targetURL.getPort(),))
             self.scannerThread.start()
         except BaseException as e:
+            self.saveButton.setEnabled(False)
             print(e)
             return
 
@@ -266,6 +271,9 @@ class BurpExtender(IBurpExtender, ITab):
         SwingUtilities.invokeLater(
                 ScannerRunnable(self.hostField.setEnabled, (True, ))
         )
+        SwingUtilities.invokeLater(
+                ScannerRunnable(self.saveButton.setEnabled, (True, ))
+        )
         setScanStatusLabel("Ready to scan")
         print("Finished scanning")
 
@@ -276,12 +284,16 @@ class BurpExtender(IBurpExtender, ITab):
 
     def saveToFile(self, event):
         fileChooser = JFileChooser()
+        if (self.hostField.text != ''):
+            fileChooser.setSelectedFile(File("Burp_SSL_Scanner_Result_%s.txt" % (self.hostField.text)))
+        else:
+            fileChooser.setSelectedFile(File("Burp_SSL_Scanner_Result.txt"))
         if (fileChooser.showSaveDialog(self.getUiComponent()) == JFileChooser.APPROVE_OPTION):
             fw = FileWriter(fileChooser.getSelectedFile())
             fw.write(self._helpers.bytesToString(self.textEditorInstance.getText()))
             fw.flush()
             fw.close()
-            print "Saved"
+            print "Saved results for %s to disk" % (self.hostField.text)
 
     def getTabCaption(self):
         return "SSL Scanner"
