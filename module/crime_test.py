@@ -1,4 +1,4 @@
-from util import tryHandshake, getHighestTLSVersion, addNecessaryExtensionToHello
+from util import getHighestTLSVersion, addNecessaryExtensionToHelloObject, getServerHelloObject
 from TLS_protocol import ClientHello
 
 class CrimeTest :
@@ -16,10 +16,13 @@ class CrimeTest :
             print("Testing CRIME (TLS) with TLS version ",version)
 
             hello = ClientHello()
-            hello.compression = '01' # DEFLATE ONLY
+            hello.compression = '0100' # DEFLATE & null
             hello.version = version
+            hello = addNecessaryExtensionToHelloObject(hello, self._host)
             hellohex = hello.createAsHex()
 
-            self._result.addResult('crime_tls',tryHandshake(self._host, self._port, addNecessaryExtensionToHello(hellohex, self._host)) >= 0 )
+            serverHello = getServerHelloObject(self._host, self._port, hellohex)
+
+            self._result.addResult('crime_tls', serverHello.compressionMethod == '01' )
             if self._result.getResult('crime_tls') :
                 self._result.addVulnerability('CRITICAL', 'Vulnerable to CRIME (TLS)')

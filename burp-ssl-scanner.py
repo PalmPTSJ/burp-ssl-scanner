@@ -228,7 +228,7 @@ class BurpExtender(IBurpExtender, ITab):
             crimeResultText = res.printResult('crime_tls')
             updateResultText(crimeResultText)
             
-
+            
             setScanStatusLabel("Checking for Cipherlist")
             cipher = cipher_test.CipherTest(res, host, port)
             cipher.start()
@@ -243,6 +243,7 @@ class BurpExtender(IBurpExtender, ITab):
                 '\n     ' + res.printResult('cipher_STRONG')
             updateResultText(cipherResultText)
             
+
             '''
             setScanStatusLabel("Checking for BREACH")
             breach = breach_test.BreachTest(res, host, 443)
