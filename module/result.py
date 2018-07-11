@@ -16,7 +16,7 @@ class Result :
 
     def printResult(self, field) :
         try:
-            return "%s: %s" % (POSSIBLE_TESTS[field], POSSIBLE_RESULTS[field][self.getResult(field)])
+            return "%s: %s" % (POSSIBLE_TESTS[field]['name'], POSSIBLE_TESTS[field]['result'][self.getResult(field)])
         except KeyError:
             return "Test does not exist"
 
