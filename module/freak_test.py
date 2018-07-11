@@ -35,4 +35,4 @@ class FreakTest :
         self._result.addResult('freak', vuln)
 
         if(vuln) :
-            self._result.addVulnerability('HIGH','Vulnerable to FREAK')
+            self._result.addVulnerability('freak')

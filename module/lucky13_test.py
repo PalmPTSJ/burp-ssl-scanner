@@ -28,4 +28,4 @@ class Lucky13Test :
 
         self._result.addResult('lucky13',tryHandshake(self._host, self._port, addNecessaryExtensionToHello(modifyHelloVersion(hello1hex,version), self._host)) >= 0 or tryHandshake(self._host, self._port, addNecessaryExtensionToHello(modifyHelloVersion(hello2hex,version), self._host)) >= 0)
         if self._result.getResult('lucky13') :
-            self._result.addVulnerability('LOW', 'Potentially vulnerable to LUCKY13, uses TLS CBC ciphers. Please check patches.')
+            self._result.addVulnerability('lucky13')

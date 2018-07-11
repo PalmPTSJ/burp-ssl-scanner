@@ -53,5 +53,5 @@ class BreachTest :
         self._result.addResult('breach', self.testPage('/', callback, helpers, 0))
         if self._result.getResult('breach') :
             # Use HTTP Compression
-            self._result.addVulnerability('HIGH', 'Vulnerable to BREACH (Can be ignored if static page or has no secret)')
+            self._result.addVulnerability('breach')
 

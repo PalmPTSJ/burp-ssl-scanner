@@ -24,11 +24,11 @@ def test_heartbleed(host, port, tlsVer) :
         else :
             print("TLS version not supported")
             return False
-        print("Sending HELLO")
+        print("[Heartbleed] Sending HELLO")
         s.sendall(hello.decode('hex'))
         parseresp(s)
 
-        print("Handshake finished, Sending HEARTBLEED")
+        print("[Heartbleed] Handshake finished, Sending HEARTBLEED")
         s.sendall(hb.decode('hex'))
         vuln = hit_hb(s,0, host, 0)
         s.close()
@@ -75,12 +75,12 @@ def hit_hb(s, dumpf, host, quiet):
     while True:
         typ, ver, pay = recvmsg(s)
         if typ is None:
-            print("[OK] No response")
+            print("[Heartbleed] OK - No response")
             #showDisplay(displayMode,'No heartbeat response received from '+host+', server likely not vulnerable')
             return False
 
         if typ == 24:
-            print("[VULN] Received heartbeat response with length: "+str(len(pay)))
+            print("[Heartbleed] Vulnerable! - Received heartbeat response with length: "+str(len(pay)))
             #showDisplay(displayMode,'Received heartbeat response:')
             if len(pay) > 3:
                 pass
@@ -91,7 +91,7 @@ def hit_hb(s, dumpf, host, quiet):
             return True
 
         if typ == 21:
-            print("[OK] Received Alert")
+            print("[Heartbleed] OK - Received Alert")
             #showDisplay(displayMode,'Received alert:')
             #showDisplay(displayMode,'Server '+ host +' returned error, likely not vulnerable')
             return False
@@ -100,7 +100,7 @@ def parseresp(s):
     while True:
         typ, ver, pay = recvmsg(s)
         if typ == None:
-            print("Server closed without sending Hello")
+            print("[Heartbleed] Server closed without sending Hello")
             #showDisplay(displayMode,'Server closed connection without sending Server Hello.')
             return 0
         # Look for server hello done message.
@@ -125,4 +125,4 @@ class HeartbleedTest :
             self._result.addResult('heartbleed',False)
         
         if self._result.getResult('heartbleed') :
-            self._result.addVulnerability('CRITICAL', 'Heartbleed')
+            self._result.addVulnerability('heartbleed')

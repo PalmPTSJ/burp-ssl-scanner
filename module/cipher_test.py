@@ -81,4 +81,4 @@ class CipherTest :
 
             self._result.addResult('cipher_'+name, offer)
             if offer and issue :
-                self._result.addVulnerability('HIGH', name+' cipher offered')
+                self._result.addVulnerability('cipher_'+name)

@@ -76,18 +76,18 @@ class ConnectionTest :
     def start(self) :
         self._result.addResult('offer_ssl2',test_sslv2(self._host,self._port))
         if self._result.getResult('offer_ssl2') :
-            self._result.addVulnerability('CRITICAL', 'SSLv2 offered')
+            self._result.addVulnerability('offer_ssl2')
 
         self._result.addResult('offer_ssl3',test_sslv3(self._host,self._port))
         if self._result.getResult('offer_ssl3') :
-            self._result.addVulnerability('HIGH', 'SSLv3 offered')
+            self._result.addVulnerability('offer_ssl3')
             
         self._result.addResult('offer_tls10',test_tls10(self._host,self._port))
         self._result.addResult('offer_tls11',test_tls11(self._host,self._port))
         self._result.addResult('offer_tls12',test_tls12(self._host,self._port))
 
         if all([not self._result.getResult(proto) for proto in ['offer_ssl2','offer_ssl3','offer_tls10','offer_tls11','offer_tls12']]) :
-            print("Server does not support any offered protocols (SSLv2 to TLS1.2)")
+            print("[Connection] Server does not support any offered protocols (SSLv2 to TLS1.2)")
             self._result.addResult('connectable',False)
         else :
             self._result.addResult('connectable',True)

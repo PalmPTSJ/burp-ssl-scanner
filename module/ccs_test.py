@@ -478,4 +478,4 @@ class CCSTest :
         self._result.addResult('ccs_injection',vuln)
 
         if self._result.getResult('ccs_injection') :
-            self._result.addVulnerability('CRITICAL', 'CCS Injection')
+            self._result.addVulnerability('ccs_injection')

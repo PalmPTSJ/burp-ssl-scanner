@@ -11,9 +11,12 @@ class PoodleTest :
         self._result.addResult('poodle_ssl3', self._result.getResult('offer_ssl3') and tryHandshake(self._host, self._port, addNecessaryExtensionToHello(cbc_hello, self._host)) != -1)
         if self._result.getResult('poodle_ssl3') :
             if not self._result.getResult('fallback_support') :
-                self._result.addVulnerability('CRITICAL', 'Vulnerable to POODLE SSLv3 and FALLBACK_SCSV not supported')
+                print("[POODLE] Vulnerable to POODLE without TLS_FALLBACK_SCSV support")
+                self._result.addVulnerability('poodle_ssl3')
             else :
                 if all([not self._result.getResult(protocol) for protocol in ["offer_tls10","offer_tls11","offer_tls12"]]) :
-                    self._result.addVulnerability('CRITICAL', 'Vulnerable to POODLE SSLv3 and SSLv3 is the highest SSL version')
+                    print("[POODLE] Vulnerable to POODLE and SSLv3 is the highest version supported")
+                    self._result.addVulnerability('poodle_ssl3')
                 else :
-                    self._result.addVulnerability('LOW', 'Vulnerable to POODLE SSLv3 but mitigated by FALLBACK_SCSV')
+                    print("[POODLE] Vulnerable to POODLE but mitigated by TLS_FALLBACK_SCSV")
+                    self._result.addVulnerability('poodle_ssl3')

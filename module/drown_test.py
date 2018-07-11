@@ -19,7 +19,6 @@ class DrownTest :
                 if cipherLength > 0:
                     print("Found %d ciphers" % (cipherLength // 3))
                     self._result.addResult('drown', True)
-                    self._result.addVulnerability('CRITICAL', 'Vulnerable to DROWN')
                 else :
                     print("Offer SSLv2 but no ciphersuite found")
                     self._result.addResult('drown', False)
@@ -28,3 +27,6 @@ class DrownTest :
                 self._result.addResult('drown', False)
         else :
             self._result.addResult('drown', False)
+
+        if self._result.getResult('drown') :
+            self._result.addVulnerability('drown')

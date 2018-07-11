@@ -22,7 +22,7 @@ class FallbackTest :
         protocol = list(filter(lambda x : self._result.getResult(x[0]), [('offer_tls12',3), ('offer_tls11',2), ('offer_tls10',1), ('offer_ssl3',0)]))
 
         if len(protocol) <= 1 :
-            print("Unable to test: Available protocol count is <= 1")
+            print("[FALLBACK] Unable to test: Available protocol count is <= 1")
             self._result.addResult('fallback_support',False)
             return
 
@@ -30,4 +30,4 @@ class FallbackTest :
         self._result.addResult('fallback_support',not tryConnect(self._host, self._port, protocol[1][1]))
 
         if not self._result.getResult('fallback_support') :
-            self._result.addVulnerability('HIGH', 'FALLBACK_SCSV not supported')
+            self._result.addVulnerability('fallback_support')

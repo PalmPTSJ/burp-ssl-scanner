@@ -13,7 +13,7 @@ class CrimeTest :
             print("[CRIME] No valid TLS version found")
             self._result.addResult('crime_tls', False)
         else :
-            print("Testing CRIME (TLS) with TLS version ",version)
+            print("[CRIME] Testing CRIME (TLS) with TLS version ",version)
 
             hello = ClientHello()
             hello.compression = '0100' # DEFLATE & null
@@ -25,4 +25,4 @@ class CrimeTest :
 
             self._result.addResult('crime_tls', serverHello.compressionMethod == '01' )
             if self._result.getResult('crime_tls') :
-                self._result.addVulnerability('CRITICAL', 'Vulnerable to CRIME (TLS)')
+                self._result.addVulnerability('crime_tls')

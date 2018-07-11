@@ -11,10 +11,10 @@ class Sweet32Test :
     def start(self) :
         version = getHighestTLSVersion(self._result)
         if version == -1 :
-            print("[SWEET32] No valid TLS version found")
+            print("[Sweet32] No valid TLS version found")
             self._result.addResult('sweet32', False)
             return
-        print("Testing SWEET32 with TLS version ",version)
+        print("[Sweet32] Testing with TLS version ",version)
         self._result.addResult('sweet32',tryHandshake(self._host, self._port, addNecessaryExtensionToHello(modifyHelloVersion(sweet32_hello,version), self._host)) != -1)
         if self._result.getResult('sweet32') :
-            self._result.addVulnerability('LOW', 'Vulnerable to SWEET32')
+            self._result.addVulnerability('sweet32')
