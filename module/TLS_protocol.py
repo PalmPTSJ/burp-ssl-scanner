@@ -85,6 +85,41 @@ class ClientHello :
         except BaseException as e :
             print("Something went wrong while parsing hello ",e)
 
+
+class ServerHello :
+    def __init__(self, helloMsg) :
+        self.version = 0
+        self.random = ''
+        self.sessionId = ''
+        self.ciphersuite = ''
+        self.compressionMethod = ''
+        # helloMsg in hex
+        if helloMsg != None :
+            self.parseFromHex(helloMsg)
+    
+    def parseFromHex(self, msg) :
+        x, msg = consume(msg, 3) # 160301
+        msg_len, msg = consume(msg, 2)
+
+        server_hello, msg = consume(msg, 1)
+        if server_hello != '02' :
+            raise BaseException('Not server hello message')
+
+        hello_len, msg = consume(msg, 3)
+        tlsVersion, msg = consume(msg, 2)
+        self.version = int(tlsVersion[3],16)
+
+        self.random, msg = consume(msg, 32)
+
+        sess_len, msg = consume(msg, 1)
+        self.sess_id, msg = consume(msg, int(sess_len,16))
+
+        self.ciphersuite, msg = consume(msg, 2)
+        self.compressionMethod, msg = consume(msg, 1)
+
+        # ignore extension
+
+
 class Extension :
     def __init__(self, extType) :
         self.type = extType

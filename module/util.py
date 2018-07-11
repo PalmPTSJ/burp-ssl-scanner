@@ -41,6 +41,14 @@ def modifyHelloVersion(hello, targetVer) :
     return hello[:18] + '030' + str(targetVer) + hello[22:]
 
 
+def getServerHelloObject(host, port, hello) :
+    try :
+        data = sendData(host, port, hello.decode('hex'))
+        return ServerHello(data.encode('hex'))
+    except BaseException as e :
+        pass
+    return None # Handshake failure
+
 
 def addNecessaryExtensionToHelloObject(helloObj, hostname) :
     helloObj.addExtension(ServerNameIndication(hostname)) 
