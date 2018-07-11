@@ -40,21 +40,24 @@ def getSupportedTLSVersion(result) :
 def modifyHelloVersion(hello, targetVer) :
     return hello[:18] + '030' + str(targetVer) + hello[22:]
 
+
+
+def addNecessaryExtensionToHelloObject(helloObj, hostname) :
+    helloObj.addExtension(ServerNameIndication(hostname)) 
+    # SessionTicketTLS
+    helloObj.addExtension(SessionTicketTLS())
+    # Signature algorithms
+    helloObj.addExtension(GenericExtension('000d0020001e060106020603050105020503040104020403030103020303020102020203')) 
+    # SupportedGroup
+    helloObj.addExtension(GenericExtension('000a003e003c000e000d0019001c001e000b000c001b00180009000a001a00160017001d000800060007001400150004000500120013000100020003000f00100011'))
+    # EC_Point format
+    #hel.addExtension(GenericExtension('000b00020100')) 
+    # Heartbeat
+    helloObj.addExtension(GenericExtension('000f000101'))
+    return helloObj
+
 def addNecessaryExtensionToHello(hello, hostname) :
     hel = ClientHello()
     hel.parseFromHex(hello)
-    # SNI
-    hel.addExtension(ServerNameIndication(hostname)) 
-    # SessionTicketTLS
-    hel.addExtension(SessionTicketTLS())
-    # Signature algorithms
-    hel.addExtension(GenericExtension('000d0020001e060106020603050105020503040104020403030103020303020102020203')) 
-    # SupportedGroup
-    hel.addExtension(GenericExtension('000a003e003c000e000d0019001c001e000b000c001b00180009000a001a00160017001d000800060007001400150004000500120013000100020003000f00100011'))
-    # EC_Point format
-    #hel.addExtension(GenericExtension('000b00020100')) 
-
-    # Heartbeat
-    hel.addExtension(GenericExtension('000f000101'))
-
+    addNecessaryExtensionToHelloObject(hel, hostname)
     return hel.createAsHex()

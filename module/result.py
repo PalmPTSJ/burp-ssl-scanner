@@ -28,11 +28,13 @@ class Result :
     
     def __init__(self):
         self._resultDict = {}
+        self.vulnerabilityList = []
         pass
 
     def addVulnerability(self, severity, name) :
         # print 
         print "VULNERABILITY FOUND: [%s] %s" % (severity, name)
+        self.vulnerabilityList.append("[%s] %s" % (severity, name))
         # Add to Burp issue
         pass
 
