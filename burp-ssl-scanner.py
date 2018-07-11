@@ -176,7 +176,7 @@ class BurpExtender(IBurpExtender, ITab):
             heartbleed.start()
             heartbleedResultText = res.printResult('heartbleed')
             updateResultText(heartbleedResultText)
-
+            
 
             setScanStatusLabel("Checking for CCS Injection")
             ccs = ccs_test.CCSTest(res, host, port)
@@ -184,7 +184,7 @@ class BurpExtender(IBurpExtender, ITab):
             ccsResultText = res.printResult('ccs_injection')
             updateResultText(ccsResultText)
 
-
+            
             setScanStatusLabel("Checking for TLS_FALLBACK_SCSV")
             fallback = fallback_test.FallbackTest(res, host, port)
             fallback.start()
@@ -247,7 +247,7 @@ class BurpExtender(IBurpExtender, ITab):
                 '\n     ' + res.printResult('cipher_HIGH') + \
                 '\n     ' + res.printResult('cipher_STRONG')
             updateResultText(cipherResultText)
-
+            
             '''
             setScanStatusLabel("Checking for BREACH")
             breach = breach_test.BreachTest(res, host, 443)
@@ -256,7 +256,10 @@ class BurpExtender(IBurpExtender, ITab):
             updateResultText(breachResultText)
             '''
 
-            updateResultText('Finished scanning')
+            updateResultText('Finished scanning\n\nSummary\n')
+
+            updateResultText('\n'.join(res.vulnerabilityList))
+
         except BaseException as e :
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 

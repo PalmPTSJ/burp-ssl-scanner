@@ -345,7 +345,7 @@ def test_ccs(strHost, iPort, strVer):
     while iCount<5:
         iCount += 1
     try:
-        recv = s.recv(2048)
+        recv = s.recv(20480)
     except:
         return False
     lstRecords = getSSLRecords(recv)
@@ -384,48 +384,80 @@ def test_ccs(strHost, iPort, strVer):
         strChangeCipherSpec += "\x00\x01" # Len
         strChangeCipherSpec += "\x01" # Payload CCS
         #print("Sending Change Cipher Spec")
+        print("[CCS] Sending CCS")
         s.send(strChangeCipherSpec)
         fVuln = True
         strLastMessage = ""
-        while iCount < 5:
+        while iCount < 3:
             iCount += 1
             s.settimeout(0.5)
             try:
-                recv = s.recv(2048)
+                recv = ''
+                recv = s.recv(20480)
+                iCount = 0
             except socket.timeout:
-                #showDisplay(displayMode,"Timeout waiting for CCS reply.")
                 continue
             except socket.error:
-                #showDisplay(displayMode,"Connection closed unexpectedly.")
-                fVuln=False
+                print("[CCS] Connection closed unexpectedly")
+                fVuln = False
                 break
-            if (recv != None and len(recv)>0):
+            if (recv != None and len(recv)>=7):
+                print("[CCS] Received something with length %d" % (len(recv)))
                 strLastMessage = recv
                 if (ord(recv[0])==21):
-                    fVuln = False
-                    break
-        try:
-            if ord(strLastMessage[-7]) == 21: # Check if an alert was at the end of the last message.
-                fVuln=False
-        except IndexError:
-            pass
+                    print("[CCS] Received alert %d" % ord(recv[6]))
+                    if ord(recv[6]) == 0x0A or ord(recv[6]) == 0x28:
+                        print("[CCS] received unexpected message or handshake failure, OK")
+                        fVuln = False
+                        break
         if fVuln:
+            # Try sending another data and see if decryption / bad_mac is return (which mean CCS got through)
+            fVuln = False
             try:
-                s.send('\x15' + dSSL[strVer] + '\x00\x02\x01\x00')
-                f = s.recv(1024)
-                if len(f) == 0:
-                    fVuln = False
+                #s.send('\x15' + dSSL[strVer] + '\x00\x02\x01\x00') # Send close notify ?
+                print("[CCS] Sending second message")
+                s.send(strChangeCipherSpec)
+                iCount = 0
+                while iCount < 3:
+                    iCount += 1
+                    s.settimeout(0.5)
+                    try:
+                        recv = ''
+                        recv = s.recv(20480)
+                        iCount = 0
+                    except socket.timeout:
+                        # If always timeout then OK
+                        continue
+                    except socket.error:
+                        print("[CCS] Connection closed unexpectedly")
+                        fVuln = False
+                        break
+                    if (recv != None and len(recv)>=7):
+                        print("[CCS] Received something with length %d" % (len(recv)))
+                        strLastMessage = recv
+                        if (ord(recv[0])==21):
+                            print("[CCS] Received alert %d" % ord(recv[6]))
+                            if ord(recv[6]) == 0x15:
+                                print("[CCS] Received decryption failure, NOT OK")
+                                fVuln = True
+                                break
+                            elif ord(recv[6]) == 0x14:
+                                print("[CCS] Received bad_record_mac, NOT OK")
+                                fVuln = True
+                                break
+                            elif ord(recv[6]) == 0x0A or ord(recv[6]) == 0x28:
+                                print("[CCS] received unexpected message or handshake failure, OK")
+                                fVuln = False
+                                break
+                            else :
+                                print("[CCS] Receieved some other alert, likely NOT OK")
+                                fVuln = True
+                                break
             except socket.error:
+                print("[CCS] Can't send second message")
                 fVuln = False
         if fVuln:
-            #showDisplay(displayMode," - [LOG] %s %s:%d may allow early CCS" % (strVer,strHost,iPort))
             return True
-        else:
-            #showDisplay(displayMode," - [LOG] %s %s:%d rejected early CCS" % (strVer,strHost,iPort))
-            pass
-    else:
-        #showDisplay(displayMode," - [LOG] %s No response from %s:%d" % (strVer,strHost,iPort))
-        pass
     try:
         s.close()
     except:
