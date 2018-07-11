@@ -13,6 +13,8 @@ __all__ = [
     'cipher_test',
     
     'result',
-    'TLS_procotol',
-    'util'
+    'TLS_protocol',
+    'util',
+    'ssl_issue_details',
+    'test_details'
 ]

@@ -1,29 +1,5 @@
-POSSIBLE_TESTS = {
-    'connectable': 'SSL/TLS Connection Test',
-    'offer_ssl2': 'Offer SSLv2',
-    'offer_ssl3': 'Offer SSLv3',
-    'offer_tls10': 'Offer TLS1.0',
-    'offer_tls11': 'Offer TLS1.1',
-    'offer_tls12': 'Offer TLS1.2',
-    'heartbleed': 'Heartbleed',
-    'ccs_injection': 'CCS Injection',
-    'fallback_support': 'TLS_FALLBACK_SCSV Support',
-    'poodle_ssl3': 'POODLE (SSLv3)',
-    'sweet32': 'SWEET32',
-    'drown': 'DROWN',
-    'freak': 'FREAK',
-    'lucky13' : 'LUCKY13',
-    'crime_tls' : 'CRIME (TLS)',
-    'breach' : 'BREACH',
-    'cipher_NULL' : 'NULL Cipher',
-    'cipher_ANON' : 'ANON Cipher',
-    'cipher_EXP' : 'EXP Cipher',
-    'cipher_LOW' : 'LOW Cipher',
-    'cipher_WEAK' : 'WEAK Cipher',
-    'cipher_3DES' : '3DES Cipher',
-    'cipher_HIGH' : 'HIGH Cipher',
-    'cipher_STRONG' : 'STRONG Cipher'
-}
+from test_details import *
+
 class Result :
     
     def __init__(self):
@@ -40,7 +16,7 @@ class Result :
 
     def printResult(self, field) :
         try:
-            return "%s %s" % (POSSIBLE_TESTS[field], self.getResult(field))
+            return "%s: %s" % (POSSIBLE_TESTS[field], POSSIBLE_RESULTS[field][self.getResult(field)])
         except KeyError:
             return "Test does not exist"
 
