@@ -12,7 +12,7 @@ try:
     from javax.swing import (JTable, JScrollPane, JSplitPane, JButton, JPanel,
                              JTextField, JLabel, SwingConstants, JDialog, Box,
                              JCheckBox, JMenuItem, SwingUtilities, JOptionPane,
-                             BoxLayout, JPopupMenu, JFileChooser)
+                             BoxLayout, JPopupMenu, JFileChooser, JTextPane)
 
     from javax.swing.border import EmptyBorder
     from javax.swing.table import AbstractTableModel
@@ -50,6 +50,7 @@ class BurpExtender(IBurpExtender, ITab):
         # initialize the main scanning event and thread
         self.scanningEvent = Event()
         self.scannerThread = None
+        self.targetURL = None
 
         # main split pane
         self._splitpane = JSplitPane(JSplitPane.VERTICAL_SPLIT)
@@ -90,11 +91,17 @@ class BurpExtender(IBurpExtender, ITab):
         self._bottomPanel = JPanel(BorderLayout(10, 10))
         self._bottomPanel.setBorder(EmptyBorder(10, 0, 0, 0))
 
-        self.textEditorInstance = callbacks.createTextEditor()
-        self.textEditorInstance.setEditable(False)
-        self.initialText = 'Press "Start scanning" to get started.\nPlease note that TLS1.3 is still not supported by this extension.'
-        self.textEditorInstance.setText(self._helpers.stringToBytes(self.initialText))
-        self._bottomPanel.add(self.textEditorInstance.getComponent(), BorderLayout.CENTER)
+        self.initialText = ('<h1 style="color: red;">Press "Start scanning" to get started.<br />'
+                            'Please note that TLS1.3 is still not supported by this extension.</h1>')
+        self.currentText = self.initialText
+
+        self.textPane = JTextPane()
+        self.textScrollPane = JScrollPane(self.textPane)
+        self.textPane.setContentType("text/html")
+        self.textPane.setText(self.currentText)
+        self.textPane.setEditable(False)
+
+        self._bottomPanel.add(self.textScrollPane, BorderLayout.CENTER)
 
         self.savePanel = JPanel(FlowLayout(FlowLayout.LEADING, 10, 10))
         self.saveButton = JButton('Save to file', actionPerformed=self.saveToFile)
@@ -130,16 +137,17 @@ class BurpExtender(IBurpExtender, ITab):
         if host.find("://") == -1:
             host = "https://" + host 
         try:
-            targetURL = URL(host)
-            if(targetURL.getPort() == -1):
-                targetURL = URL("https", targetURL.getHost(), 443, "/")
+            self.targetURL = URL(host)
+            if(self.targetURL.getPort() == -1):
+                self.targetURL = URL("https", self.targetURL.getHost(), 443, "/")
             self.hostField.setEnabled(False)
             self.toggleButton.setEnabled(False)
             self.saveButton.setEnabled(False)
-            self.textEditorInstance.setText(self._helpers.stringToBytes(self.initialText))
-            self.updateText("Scanning %s:%d" % (targetURL.getHost(), targetURL.getPort()))
-            print("Scanning %s:%d" % (targetURL.getHost(), targetURL.getPort()))
-            self.scannerThread = Thread(target=self.scan, args=(targetURL, ))
+            self.currentText = self.initialText
+            self.textPane.setText(self.currentText)
+            self.updateText("<h2>Scanning %s:%d</h2>" % (self.targetURL.getHost(), self.targetURL.getPort()))
+            print("Scanning %s:%d" % (self.targetURL.getHost(), self.targetURL.getPort()))
+            self.scannerThread = Thread(target=self.scan, args=(self.targetURL, ))
             self.scannerThread.start()
         except BaseException as e:
             self.saveButton.setEnabled(False)
@@ -166,11 +174,11 @@ class BurpExtender(IBurpExtender, ITab):
             con = connection_test.ConnectionTest(res, host, port)
             con.start()
             conResultText = res.printResult('connectable') + \
-                '\n     ' + res.printResult('offer_ssl2') + \
-                '\n     ' + res.printResult('offer_ssl3') + \
-                '\n     ' + res.printResult('offer_tls10') + \
-                '\n     ' + res.printResult('offer_tls11') + \
-                '\n     ' + res.printResult('offer_tls12')
+                '<ul><li>' + res.printResult('offer_ssl2') + '</li>' + \
+                '<li>' + res.printResult('offer_ssl3') + '</li>' + \
+                '<li>' + res.printResult('offer_tls10') + '</li>' + \
+                '<li>' + res.printResult('offer_tls11') + '</li>' + \
+                '<li>' + res.printResult('offer_tls12') + '</li></ul>'
             updateResultText(conResultText)
 
             
@@ -246,14 +254,14 @@ class BurpExtender(IBurpExtender, ITab):
             cipher = cipher_test.CipherTest(res, host, port)
             cipher.start()
             cipherResultText = 'Available ciphers:' + \
-                '\n     ' + res.printResult('cipher_NULL') + \
-                '\n     ' + res.printResult('cipher_ANON') + \
-                '\n     ' + res.printResult('cipher_EXP') + \
-                '\n     ' + res.printResult('cipher_LOW') + \
-                '\n     ' + res.printResult('cipher_WEAK') + \
-                '\n     ' + res.printResult('cipher_3DES') + \
-                '\n     ' + res.printResult('cipher_HIGH') + \
-                '\n     ' + res.printResult('cipher_STRONG')
+                '<ul><li>' + res.printResult('cipher_NULL') + '</li>' + \
+                '<li>' + res.printResult('cipher_ANON') + '</li>' + \
+                '<li>' + res.printResult('cipher_EXP') + '</li>' + \
+                '<li>' + res.printResult('cipher_LOW') + '</li>' + \
+                '<li>' + res.printResult('cipher_WEAK') + '</li>' + \
+                '<li>' + res.printResult('cipher_3DES') + '</li>' + \
+                '<li>' + res.printResult('cipher_HIGH') + '</li>' + \
+                '<li>' + res.printResult('cipher_STRONG') + '</li></ul>' 
             updateResultText(cipherResultText)
             
 
@@ -265,7 +273,7 @@ class BurpExtender(IBurpExtender, ITab):
             updateResultText(breachResultText)
             '''
 
-            updateResultText('Finished scanning\n\n')
+            updateResultText('Finished scanning<br /><br />')
 
             #updateResultText('\n'.join(res.vulnerabilityList))
 
@@ -290,22 +298,22 @@ class BurpExtender(IBurpExtender, ITab):
         print("Finished scanning")
 
     def updateText(self, stringToAppend):
-        currentText = self._helpers.bytesToString(self.textEditorInstance.getText())
-        currentText += ('\n' + stringToAppend)
-        self.textEditorInstance.setText(self._helpers.stringToBytes(currentText))
+        self.currentText += ('<br />' + stringToAppend)
+        self.textPane.setText(self.currentText)
 
     def saveToFile(self, event):
         fileChooser = JFileChooser()
-        if (self.hostField.text != ''):
-            fileChooser.setSelectedFile(File("Burp_SSL_Scanner_Result_%s.txt" % (self.hostField.text)))
+        if not (self.targetURL is None):
+            fileChooser.setSelectedFile(File("Burp_SSL_Scanner_Result_%s.html" \
+                % (self.targetURL.getHost())))
         else:
-            fileChooser.setSelectedFile(File("Burp_SSL_Scanner_Result.txt"))
+            fileChooser.setSelectedFile(File("Burp_SSL_Scanner_Result.html"))
         if (fileChooser.showSaveDialog(self.getUiComponent()) == JFileChooser.APPROVE_OPTION):
             fw = FileWriter(fileChooser.getSelectedFile())
-            fw.write(self._helpers.bytesToString(self.textEditorInstance.getText()))
+            fw.write(self.textPane.getText())
             fw.flush()
             fw.close()
-            print "Saved results for %s to disk" % (self.hostField.text)
+            print "Saved results to disk"
 
     def getTabCaption(self):
         return "SSL Scanner"
