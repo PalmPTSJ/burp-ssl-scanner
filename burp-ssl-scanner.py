@@ -249,7 +249,20 @@ class BurpExtender(IBurpExtender, ITab):
             crimeResultText = res.printResult('crime_tls')
             updateResultText(crimeResultText)
             
+            setScanStatusLabel("Checking for BEAST")
+            beast = beast_test.BeastTest(res, host, port)
+            beast.start()
+            beastResultText = res.printResult('beast')
+            updateResultText(beastResultText)
             
+            '''
+            setScanStatusLabel("Checking for BREACH")
+            breach = breach_test.BreachTest(res, host, 443)
+            breach.start(self._callbacks, self._helpers)
+            breachResultText = res.printResult('breach')
+            updateResultText(breachResultText)
+            '''
+
             setScanStatusLabel("Checking for Cipherlist")
             cipher = cipher_test.CipherTest(res, host, port)
             cipher.start()
@@ -263,22 +276,6 @@ class BurpExtender(IBurpExtender, ITab):
                 '<li>' + res.printResult('cipher_HIGH') + '</li>' + \
                 '<li>' + res.printResult('cipher_STRONG') + '</li></ul>' 
             updateResultText(cipherResultText)
-            
-
-            setScanStatusLabel("Checking for BEAST")
-            beast = beast_test.BeastTest(res, host, port)
-            beast.start()
-            beastResultText = res.printResult('beast')
-            updateResultText(beastResultText)
-
-
-            '''
-            setScanStatusLabel("Checking for BREACH")
-            breach = breach_test.BreachTest(res, host, 443)
-            breach.start(self._callbacks, self._helpers)
-            breachResultText = res.printResult('breach')
-            updateResultText(breachResultText)
-            '''
 
             updateResultText('Finished scanning<br /><br />Summary')
 
