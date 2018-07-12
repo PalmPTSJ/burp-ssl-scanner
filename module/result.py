@@ -4,37 +4,37 @@ from java.lang import Runnable
 from javax.swing import SwingUtilities
 class Result :
     
-    def __init__(self, url, callbacks, helpers):
+    def __init__(self, url, callbacks, helpers, addToSitemap):
         self._resultDict = {}
         self.url = url
         self.callbacks = callbacks
         self.helpers = helpers
+        self.addToSitemap = addToSitemap
         self.issueList = []
 
     def addVulnerability(self, issueKey) :
         print "VULNERABILITY FOUND: [%s]" % (issueKey)
 
-        # Add to Burp issue
+        # Add issue to summary list
         issue = SSLIssue(issueKey, self.url, self.helpers)
         self.issueList.append('<li>[%s] %s</li>' % (issue.getSeverity(), issue.getIssueName().replace('[SSL Scanner] ','')))
 
-        scanIssues = self.callbacks.getScanIssues(self.url.getProtocol()+"://"+self.url.getHost())
-        print("Scan issue: ",len(scanIssues))
-        # Check if the issue already exists
-        for oldIssue in scanIssues :
-            try :
-                if oldIssue.getIssueName() == issue.getIssueName() :
-                    # exists
-                    print("Found !")
-                    break
-            except BaseException as e :
-                print("Exception",e)
-                pass
-        else :
-            # Not exists, add new issue
-            SwingUtilities.invokeLater(
-                    ScannerRunnable(self.callbacks.addScanIssue, (issue, ))
-            )
+        # Add to Burp issue
+        if self.addToSitemap  :
+            scanIssues = self.callbacks.getScanIssues(self.url.getProtocol()+"://"+self.url.getHost())
+            # Check if the issue already exists
+            for oldIssue in scanIssues :
+                try :
+                    if oldIssue.getIssueName() == issue.getIssueName() :
+                        # exists
+                        break
+                except BaseException as e :
+                    pass
+            else :
+                # Not exists, add new issue
+                SwingUtilities.invokeLater(
+                        ScannerRunnable(self.callbacks.addScanIssue, (issue, ))
+                )
 
     def printAllIssue(self) :
         return  '<ul>' + ''.join(self.issueList) + '</ul>'

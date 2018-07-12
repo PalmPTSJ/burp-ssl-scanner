@@ -73,6 +73,13 @@ class BurpExtender(IBurpExtender, ITab):
             'Start scanning', actionPerformed=self.startScan)
         self.setupPanel.add(self.toggleButton)
 
+        if 'Professional' in callbacks.getBurpVersion()[0] :
+            self.addToSitemapCheckbox = JCheckBox('Add to sitemap', True)
+        else :
+            self.addToSitemapCheckbox = JCheckBox('Add to sitemap (requires Professional version)', False)
+            self.addToSitemapCheckbox.setEnabled(False)
+        self.setupPanel.add(self.addToSitemapCheckbox)
+
         self._topPanel.add(self.setupPanel, BorderLayout.PAGE_START)
         
         # Status bar
@@ -122,11 +129,7 @@ class BurpExtender(IBurpExtender, ITab):
         callbacks.registerContextMenuFactory(self.scannerMenu)
         print "SSL Scanner custom menu loaded"
 
-        #print os.popen("openssl version").read()
-
         print 'Done'
-
-        #print 'SSL VERSION: '+ssl.OPENSSL_VERSION
         
     def startScan(self, ev) :
 
@@ -143,6 +146,7 @@ class BurpExtender(IBurpExtender, ITab):
             self.hostField.setEnabled(False)
             self.toggleButton.setEnabled(False)
             self.saveButton.setEnabled(False)
+            self.addToSitemapCheckbox.setEnabled(False)
             self.currentText = self.initialText
             self.textPane.setText(self.currentText)
             self.updateText("<h2>Scanning %s:%d</h2>" % (self.targetURL.getHost(), self.targetURL.getPort()))
@@ -165,7 +169,7 @@ class BurpExtender(IBurpExtender, ITab):
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.updateText, (text, )))
 
-        res = result.Result(url, self._callbacks, self._helpers)
+        res = result.Result(url, self._callbacks, self._helpers, self.addToSitemapCheckbox.isSelected())
 
         host, port = url.getHost(), url.getPort()
 
@@ -287,7 +291,6 @@ class BurpExtender(IBurpExtender, ITab):
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("An error occurred. Please refer to the output/errors tab for more information.",)))
             time.sleep(1)
-            print(e)
 
         self.scanningEvent.clear()
         SwingUtilities.invokeLater(
@@ -299,6 +302,10 @@ class BurpExtender(IBurpExtender, ITab):
         SwingUtilities.invokeLater(
                 ScannerRunnable(self.saveButton.setEnabled, (True, ))
         )
+        if 'Professional' in self._callbacks.getBurpVersion()[0] :
+            SwingUtilities.invokeLater(
+                ScannerRunnable(self.addToSitemapCheckbox.setEnabled, (True, ))
+            )
         setScanStatusLabel("Ready to scan")
         print("Finished scanning")
 
