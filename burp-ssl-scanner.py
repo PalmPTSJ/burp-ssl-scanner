@@ -187,7 +187,7 @@ class BurpExtender(IBurpExtender, ITab):
 
             
             if not res.getResult('connectable') :
-                updateResultText("Scan terminated (Connection failed)")
+                updateResultText("<h2>Scan terminated (Connection failed)</h2>")
                 raise BaseException('Connection failed')
 
             
