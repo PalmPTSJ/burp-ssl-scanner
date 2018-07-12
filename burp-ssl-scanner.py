@@ -91,7 +91,7 @@ class BurpExtender(IBurpExtender, ITab):
         self._bottomPanel = JPanel(BorderLayout(10, 10))
         self._bottomPanel.setBorder(EmptyBorder(10, 0, 0, 0))
 
-        self.initialText = ('<h1 style="color: red;">Press "Start scanning" to get started.<br />'
+        self.initialText = ('<h1 style="color: red;">Burp SSL Scanner<br />'
                             'Please note that TLS1.3 is still not supported by this extension.</h1>')
         self.currentText = self.initialText
 
@@ -173,7 +173,7 @@ class BurpExtender(IBurpExtender, ITab):
             setScanStatusLabel("Checking for supported SSL/TLS versions")
             con = connection_test.ConnectionTest(res, host, port)
             con.start()
-            conResultText = res.printResult('connectable') + \
+            conResultText = '<hr /><br /><h3>' + res.printResult('connectable') + '</h3>' + \
                 '<ul><li>' + res.printResult('offer_ssl2') + '</li>' + \
                 '<li>' + res.printResult('offer_ssl3') + '</li>' + \
                 '<li>' + res.printResult('offer_tls10') + '</li>' + \
@@ -266,7 +266,7 @@ class BurpExtender(IBurpExtender, ITab):
             setScanStatusLabel("Checking for Cipherlist")
             cipher = cipher_test.CipherTest(res, host, port)
             cipher.start()
-            cipherResultText = 'Available ciphers:' + \
+            cipherResultText = '<h3>Available ciphers:</h3>' + \
                 '<ul><li>' + res.printResult('cipher_NULL') + '</li>' + \
                 '<li>' + res.printResult('cipher_ANON') + '</li>' + \
                 '<li>' + res.printResult('cipher_EXP') + '</li>' + \
@@ -277,7 +277,7 @@ class BurpExtender(IBurpExtender, ITab):
                 '<li>' + res.printResult('cipher_STRONG') + '</li></ul>' 
             updateResultText(cipherResultText)
 
-            updateResultText('Finished scanning<br /><br />Summary')
+            updateResultText('<h2>Finished scanning</h2><br /><hr /><br /><h2>Summary</h2>')
 
             updateResultText(res.printAllIssue())
 

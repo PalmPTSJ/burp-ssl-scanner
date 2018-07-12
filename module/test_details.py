@@ -27,12 +27,12 @@ POSSIBLE_TESTS = {
     'connectable': {
         'internalType': 0,
         'name': 'SSL/TLS Connection Test',
-        'result': ['Failed', 'Successful'],
+        'result': ['<b style="color: red;">Failed</b>', '<b style="color: green;">Successful</b>'],
     },
     'offer_ssl2': {
         'internalType': 1,
         'name': 'Offer SSLv2',
-        'result': ['No', 'Yes (not OK)'],
+        'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'High',
         'confidence': 'Certain',
         'issueBackground': \
@@ -44,7 +44,7 @@ POSSIBLE_TESTS = {
     'offer_ssl3': {
         'internalType': 2,
         'name': 'Offer SSLv3',
-        'result': ['No', 'Yes (not OK)'],
+        'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'High',
         'confidence': 'Certain',
         'issueBackground': \
@@ -66,12 +66,12 @@ POSSIBLE_TESTS = {
     'offer_tls12' : {
         'internalType': 5,
         'name': 'Offer TLS1.2',
-        'result': ['No', 'Yes']
+        'result': ['No', '<b style="color: green;">Yes</b>']
     },
     'heartbleed': {
         'internalType': 6,
         'name': 'Heartbleed',
-        'result': ['Not vulnerable', 'Vulnerable'],
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>'],
         'severity': 'High',
         'confidence': 'Certain',
         'issueBackground': \
@@ -85,7 +85,7 @@ POSSIBLE_TESTS = {
     'ccs_injection': {
         'internalType': 7,
         'name': 'CCS Injection',
-        'result': ['Not vulnerable', 'Vulnerable'],
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>'],
         'severity': 'High',
         'confidence': 'Certain',
         'issueBackground': \
@@ -100,7 +100,7 @@ POSSIBLE_TESTS = {
     'fallback_support': {
         'internalType': 8,
         'name': 'TLS_FALLBACK_SCSV Support',
-        'result': ['No', 'Yes'],
+        'result': ['<b style="color: red;">No</b>', '<b style="color: green;">Yes</b>'],
         'severity': 'Medium',
         'confidence': 'Certain',
         'issueBackground': \
@@ -115,9 +115,9 @@ POSSIBLE_TESTS = {
     'poodle_ssl3': {
         'internalType': 9,
         'name': 'POODLE (SSLv3)',
-        'result': ['Not vulnerable', 'Vulnerable'],
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>'],
         'severity': 'High',
-        'confidence': 'Certain',
+        'confidence': 'Tentative',
         'issueBackground': \
             ("The host is vulnerable to the POODLE attack "
              "which affects every website that supports SSLv3. "
@@ -136,7 +136,7 @@ POSSIBLE_TESTS = {
     'sweet32': {
         'internalType': 10,
         'name': 'Sweet32',
-        'result': ['Not vulnerable', 'Vulnerable'],
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>'],
         'severity': 'Medium',
         'confidence': 'Firm',
         'issueBackground': \
@@ -150,7 +150,7 @@ POSSIBLE_TESTS = {
     'drown': {
         'internalType': 11,
         'name': 'DROWN',
-        'result': ['Not vulnerable', 'Vulnerable'],
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>'],
         'severity': 'Medium',
         'confidence': 'Firm',
         'issueBackground': \
@@ -166,7 +166,7 @@ POSSIBLE_TESTS = {
     'freak': {
         'internalType': 12,
         'name': 'FREAK',
-        'result': ['Not vulnerable', 'Vulnerable'],
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>'],
         'severity': 'Medium',
         'confidence': 'Firm',
         'issueBackground': \
@@ -181,7 +181,7 @@ POSSIBLE_TESTS = {
     'lucky13' : {
         'internalType': 13,
         'name': 'LUCKY13',
-        'result': ['Not vulnerable', 'Potentially vulnerable'],
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: orange;">Potentially vulnerable</b>'],
         'severity': 'Low',
         'confidence': 'Tentative',
         'issueBackground': \
@@ -195,7 +195,7 @@ POSSIBLE_TESTS = {
     'crime_tls' : {
         'internalType': 14,
         'name': 'CRIME (TLS)',
-        'result': ['Not vulnerable', 'Vulnerable'],
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>'],
         'severity': 'Low',
         'confidence': 'Certain',
         'issueBackground': \
@@ -209,12 +209,12 @@ POSSIBLE_TESTS = {
     'breach' : {
         'internalType': 15,
         'name': 'BREACH',
-        'result': ['Not vulnerable', 'Vulnerable']
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>']
     },
     'cipher_NULL' : {
         'internalType': 16,
         'name': 'NULL Cipher (no encryption)',
-        'result': ['No', 'Yes (not OK)'],
+        'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'High',
         'confidence': 'Certain',
         'issueBackground': 'Server offer null ciphers which does not encrypt the data at all',
@@ -223,7 +223,7 @@ POSSIBLE_TESTS = {
     'cipher_ANON' : {
         'internalType': 17,
         'name': 'ANON Cipher (no authentication)',
-        'result': ['No', 'Yes (not OK)'],
+        'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'High',
         'confidence': 'Certain',
         'issueBackground': 'Server offer anonymous ciphers which can lead to Man in the Middle attack',
@@ -232,7 +232,7 @@ POSSIBLE_TESTS = {
     'cipher_EXP' : {
         'internalType': 18,
         'name': 'EXP Cipher (without ADH+NULL)',
-        'result': ['No', 'Yes (not OK)'],
+        'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'High',
         'confidence': 'Certain',
         'issueBackground': 'Server offer export ciphers which is insecure.',
@@ -241,7 +241,7 @@ POSSIBLE_TESTS = {
     'cipher_LOW' : {
         'internalType': 19,
         'name': 'LOW Cipher (64 Bit + DES Encryption)',
-        'result': ['No', 'Yes (not OK)'],
+        'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'Medium',
         'confidence': 'Certain',
         'issueBackground': 'Server offer low strength ciphers (64 bit + DES).',
@@ -250,7 +250,7 @@ POSSIBLE_TESTS = {
     'cipher_WEAK' : {
         'internalType': 20,
         'name': 'WEAK Cipher (SEED, IDEA, RC2, RC4)',
-        'result': ['No', 'Yes (not OK)'],
+        'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'Medium',
         'confidence': 'Certain',
         'issueBackground': 'Server offer weak ciphers (SEED, IDEA, RC2, RC4).',
@@ -259,7 +259,7 @@ POSSIBLE_TESTS = {
     'cipher_3DES' : { # Not recommended
         'internalType': 21,
         'name': '3DES Cipher (Medium)',
-        'result': ['No', 'Yes (not recommended)'],
+        'result': ['<b style="color: green;">No</b>', '<b style="color: orange;">Yes (not recommended)</b>'],
         'severity': 'Information',
         'confidence': 'Certain',
         'issueBackground': 'Server offer 3DES ciphers which are prone to birthday attack (Sweet32).',
@@ -268,20 +268,19 @@ POSSIBLE_TESTS = {
     'cipher_HIGH' : { # Not an issue
         'internalType': 22,
         'name': 'HIGH Cipher (AES+Camellia, no AEAD)',
-        'result': ['No', 'Yes']
+        'result': ['<b style="color: red;">No (not OK)</b>', '<b style="color: green;">Yes (OK)</b>']
     },
     'cipher_STRONG' : { # Not an issue
         'internalType': 23,
         'name': 'STRONG Cipher (AEAD Ciphers)',
-        'result': ['No', 'Yes'],
+        'result': ['<b style="color: red;">No (not OK)</b>', '<b style="color: green;">Yes (OK)</b>'],
     },
-
     'beast' : {
         'internalType': 24,
         'name': 'BEAST',
-        'result': ['Not vulnerable', 'Vulnerable'],
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>'],
         'severity': 'Medium',
-        'confidence': 'Certain',
+        'confidence': 'Tentative',
         'issueBackground': \
             ("Server offer CBC ciphers with SSLv3 or TLS1.0. "
             "which allows man-in-the-middle attackers to obtain plaintext HTTP headers "

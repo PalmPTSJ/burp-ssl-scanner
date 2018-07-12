@@ -19,6 +19,7 @@ Burp Suite plugin for scanning SSL vulnerabilities.
 - FREAK
 - LUCKY13
 - CRIME (TLS Compression)
+- BEAST
 - Check for weak ciphers
 
 ### Notes

@@ -16,7 +16,7 @@ class Result :
 
         # Add to Burp issue
         issue = SSLIssue(issueKey, self.url, self.helpers)
-        self.issueList.append('[%s] %s' % (issue.getSeverity(), issue.getIssueName().replace('[SSL Scanner] ','')))
+        self.issueList.append('<li>[%s] %s</li>' % (issue.getSeverity(), issue.getIssueName().replace('[SSL Scanner] ','')))
 
         scanIssues = self.callbacks.getScanIssues(self.url.getProtocol()+"://"+self.url.getHost())
         print("Scan issue: ",len(scanIssues))
@@ -37,11 +37,11 @@ class Result :
             )
 
     def printAllIssue(self) :
-        return '<br />'.join(self.issueList)
+        return  '<ul>' + ''.join(self.issueList) + '</ul>'
 
     def printResult(self, field) :
         try:
-            return "%s: %s" % (POSSIBLE_TESTS[field]['name'], POSSIBLE_TESTS[field]['result'][self.getResult(field)])
+            return "<b>%s</b>: %s" % (POSSIBLE_TESTS[field]['name'], POSSIBLE_TESTS[field]['result'][self.getResult(field)])
         except KeyError:
             return "Test does not exist"
 
