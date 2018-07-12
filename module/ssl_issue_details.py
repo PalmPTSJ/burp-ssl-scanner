@@ -16,7 +16,7 @@ class SSLIssue(IScanIssue):
         return POSSIBLE_TESTS[self.issueKey]['internalType']
 
     def getIssueName(self):
-        return POSSIBLE_TESTS[self.issueKey]['name']
+        return "[SSL Scanner] "+POSSIBLE_TESTS[self.issueKey]['name']
 
     def getIssueType(self):
         return 0x08000000

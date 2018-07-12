@@ -11,6 +11,7 @@ __all__ = [
     'crime_test', 
     'breach_test',
     'cipher_test',
+    'beast_test',
     
     'result',
     'TLS_protocol',

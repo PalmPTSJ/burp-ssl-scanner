@@ -129,12 +129,14 @@ POSSIBLE_TESTS = {
         'remediationBackground': \
             ("If OpenSSL is used, update to version 1.0.1j or higher. "
              "Otherwise, update the web server and client to the latest version. "
+             "Check for TLS_FALLBACK_SCSV support on the server to prevent downgrade attack and help mitigate this issue "
+             "(SSL Scanner will report if there is no support for TLS_FALLBACK_SCSV). "
              "Also, SSLv3 should never be offered.")
     },
     'sweet32': {
         'internalType': 10,
         'name': 'Sweet32',
-        'result': ['Not vulnerable', 'Potentially vulnerable'],
+        'result': ['Not vulnerable', 'Vulnerable'],
         'severity': 'Medium',
         'confidence': 'Firm',
         'issueBackground': \
@@ -272,5 +274,22 @@ POSSIBLE_TESTS = {
         'internalType': 23,
         'name': 'STRONG Cipher (AEAD Ciphers)',
         'result': ['No', 'Yes'],
+    },
+
+    'beast' : {
+        'internalType': 24,
+        'name': 'BEAST',
+        'result': ['Not vulnerable', 'Vulnerable'],
+        'severity': 'Medium',
+        'confidence': 'Certain',
+        'issueBackground': \
+            ("Server offer CBC ciphers with SSLv3 or TLS1.0. "
+            "which allows man-in-the-middle attackers to obtain plaintext HTTP headers "
+            "via a blockwise chosen-boundary attack (BCBA) on an HTTPS session. "
+            "<a href='https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2011-3389'>(CVE-2011-3389)</a>"), 
+        'remediationBackground': \
+            ("Disable SSLv3 and TLS1.0 if possible. "
+            "Check for TLS_FALLBACK_SCSV support to prevent downgrade attack."
+            "Disable CBC ciphers and use more secure ciphers that are supported in higher protocol.")
     }
 }
