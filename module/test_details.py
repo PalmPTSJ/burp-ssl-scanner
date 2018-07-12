@@ -131,7 +131,9 @@ POSSIBLE_TESTS = {
              "Otherwise, update the web server and client to the latest version. "
              "Check for TLS_FALLBACK_SCSV support on the server to prevent downgrade attack and help mitigate this issue "
              "(SSL Scanner will report if there is no support for TLS_FALLBACK_SCSV). "
-             "Also, SSLv3 should never be offered.")
+             "<b>Also, SSLv3 should never be offered.</b> "
+             "<ul><li>For <b>Internet Explorer 6</b>, there is an option to <b>disable SSLv3 and "
+             "enable TLS1.0</b>. However, it is only advisable as a <b>workaround.</b></li></ul>")
     },
     'sweet32': {
         'internalType': 10,
