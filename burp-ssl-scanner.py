@@ -257,6 +257,13 @@ class BurpExtender(IBurpExtender, ITab):
             updateResultText(cipherResultText)
             
 
+            setScanStatusLabel("Checking for BEAST")
+            beast = beast_test.BeastTest(res, host, port)
+            beast.start()
+            beastResultText = res.printResult('beast')
+            updateResultText(beastResultText)
+
+
             '''
             setScanStatusLabel("Checking for BREACH")
             breach = breach_test.BreachTest(res, host, 443)
@@ -265,11 +272,12 @@ class BurpExtender(IBurpExtender, ITab):
             updateResultText(breachResultText)
             '''
 
-            updateResultText('Finished scanning\n\n')
+            updateResultText('Finished scanning\n\nSummary')
 
-            #updateResultText('\n'.join(res.vulnerabilityList))
+            updateResultText(res.printAllIssue())
 
         except BaseException as e :
+            print(e)
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("An error occurred. Please refer to the output/errors tab for more information.",)))
