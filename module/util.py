@@ -66,6 +66,24 @@ def getSupportedCipher(host, port, version, ciphers) :
             break
     return toRet
 
+'''
+def doFullHandshake(host, port, version, hello) :
+    # do a full handshake instead of hello (parse all response from server)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(5)
+    try :
+        s.connect((host, port))
+        s.sendall(hello.decode('hex'))
+        while True :
+            # Loop until receive ServerHelloDone
+        rec = s.recv(1024*10)
+        s.close()
+    except BaseException as e :
+        s.close()
+        raise e
+    return rec
+'''
+
 
 
 # cbc_hello = '16030100eb010000e7[0303]54511e7adeadbeef3133070000000000cfbd3904cc160a8503909f770433d4de00002ec012c008c01cc01bc01a001600130010000dc017001bc00dc003000a0093008b001f0023c034008ffeffffe000ff0100009000000013001100000e7777772e676f6f676c652e636f6d0023000033740000000d0020001e060106020603050105020503040104020403030103020303020102020203000a003e003c000e000d0019001c001e000b000c001b00180009000a001a00160017001d000800060007001400150004000500120013000100020003000f00100011000b00020100000f000101'

@@ -302,5 +302,29 @@ POSSIBLE_TESTS = {
         'issueBackground': \
             ("The list of the cipher suites supported by this host is as follows:"),
         'remediationBackground': None
+    },
+    'logjam_export' : {
+        'internalType': 26,
+        'name': 'LOGJAM (Export)',
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>'],
+        'severity': 'High',
+        'confidence': 'Certain',
+        'issueBackground': \
+            ("Server offer DHE_EXPORT cipher which is insecure. "),
+        'remediationBackground': \
+            ("Disable DHE_EXPORT cipher. ")
+    },
+    'logjam_common' : {
+        'internalType': 27,
+        'name': 'LOGJAM (Common Prime)',
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>'],
+        'severity': 'Medium',
+        'confidence': 'Certain',
+        'issueBackground': \
+            ("Server offer Diffie-Hellman key exchange with common prime number whose size is 1024-bit or less. "
+            "Attackers can do precomputation using only this prime to quickly break individual connections. "
+            "It is suspected that the prime can be broken by nation-level agencies. "), 
+        'remediationBackground': \
+            ("Configure the server to use a 2048-bit Diffie-Hellman group. ")
     }
 }

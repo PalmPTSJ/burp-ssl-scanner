@@ -277,6 +277,13 @@ class BurpExtender(IBurpExtender, ITab):
                 '<li>' + res.printResult('cipher_HIGH') + '</li>' + \
                 '<li>' + res.printResult('cipher_STRONG') + '</li></ul>' 
             updateResultText(cipherResultText)
+            
+
+            setScanStatusLabel("Checking for LOGJAM")
+            logjam = logjam_test.LogjamTest(res, host, port)
+            logjam.start()
+            logjamResultText = res.printResult('logjam_export') + '<br />' + res.printResult('logjam_common') 
+            updateResultText(logjamResultText)
 
             '''
             setScanStatusLabel("Checking for BREACH")
@@ -291,6 +298,7 @@ class BurpExtender(IBurpExtender, ITab):
             updateResultText('<h2>Supported ciphers</h2>')
             updateResultText(res.printCipherList())
 
+            updateResultText('<h2>Issues found</h2>')
             updateResultText(res.printAllIssue())
 
         except BaseException as e :
