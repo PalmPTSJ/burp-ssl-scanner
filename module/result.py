@@ -13,10 +13,12 @@ class Result :
         self.issueList = []
 
     def addVulnerability(self, issueKey, additionalInfo = None) :
-        print "VULNERABILITY FOUND: [%s] - %s" % (issueKey, additionalInfo)
+        print "TEST FOUND: [%s] - %s" % (issueKey, additionalInfo)
 
         # Add issue to summary list
         issue = SSLIssue(issueKey, self.url, self.helpers)
+        if not (additionalInfo is None):
+            issue.setIssueDetail(additionalInfo)
         self.issueList.append('<li>[%s] %s</li>' % (issue.getSeverity(), issue.getIssueName().replace('[SSL Scanner] ','')))
 
         # Add to Burp issue
@@ -44,6 +46,23 @@ class Result :
             return "<b>%s</b>: %s" % (POSSIBLE_TESTS[field]['name'], POSSIBLE_TESTS[field]['result'][self.getResult(field)])
         except KeyError:
             return "Test does not exist"
+    
+    def printCipherList(self, vuln=None) :
+        try:
+            resultList = ""
+            for protocol in self.getResult('supported_ciphers'):    
+                if(len(self.getResult('supported_ciphers')[protocol]) > 0):
+                    resultList += protocol + "<br /><ul><li>" \
+                    + "</li><li>".join([cipher['name'] for cipher in self.getResult('supported_ciphers')[protocol]]) \
+                    + "</li></ul>"
+            print(resultList)
+            # check if we are printing the full list for the summary
+            if (vuln is None):
+                self.addVulnerability('supported_ciphers', resultList)
+            return resultList
+        except:
+            return ("The cipher list has not been generated yet.<br />"
+                    "An error might have occurred during the cipher enumeration stage.")
 
     def addResult(self, field, val) :
         print "%s %s" % (field, val)

@@ -190,11 +190,9 @@ class BurpExtender(IBurpExtender, ITab):
                 updateResultText("<h2>Scan terminated (Connection failed)</h2>")
                 raise BaseException('Connection failed')
 
-            '''
+            setScanStatusLabel("Checking for supported cipher suites")
             supportedCipher = supportedCipher_test.SupportedCipherTest(res, host, port)
             supportedCipher.start()
-            '''
-
 
             setScanStatusLabel("Checking for Cipherlist")
             cipher = cipher_test.CipherTest(res, host, port)
@@ -297,6 +295,10 @@ class BurpExtender(IBurpExtender, ITab):
 
             updateResultText('<h2>Finished scanning</h2><br /><hr /><br /><h2>Summary</h2>')
 
+            updateResultText('<h2>Supported ciphers</h2>')
+            updateResultText(res.printCipherList())
+
+            updateResultText('<h2>Issues found</h2>')
             updateResultText(res.printAllIssue())
 
         except BaseException as e :
@@ -304,7 +306,7 @@ class BurpExtender(IBurpExtender, ITab):
             SwingUtilities.invokeLater(
                 ScannerRunnable(self.scanStatusLabel.setText, 
                                 ("An error occurred. Please refer to the output/errors tab for more information.",)))
-            time.sleep(1)
+            time.sleep(2)
 
         self.scanningEvent.clear()
         SwingUtilities.invokeLater(
