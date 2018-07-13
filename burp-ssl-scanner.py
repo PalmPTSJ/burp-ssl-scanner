@@ -196,6 +196,20 @@ class BurpExtender(IBurpExtender, ITab):
             '''
 
 
+            setScanStatusLabel("Checking for Cipherlist")
+            cipher = cipher_test.CipherTest(res, host, port)
+            cipher.start()
+            cipherResultText = '<h3>Available ciphers:</h3>' + \
+                '<ul><li>' + res.printResult('cipher_NULL') + '</li>' + \
+                '<li>' + res.printResult('cipher_ANON') + '</li>' + \
+                '<li>' + res.printResult('cipher_EXP') + '</li>' + \
+                '<li>' + res.printResult('cipher_LOW') + '</li>' + \
+                '<li>' + res.printResult('cipher_WEAK') + '</li>' + \
+                '<li>' + res.printResult('cipher_3DES') + '</li>' + \
+                '<li>' + res.printResult('cipher_HIGH') + '</li>' + \
+                '<li>' + res.printResult('cipher_STRONG') + '</li></ul>' 
+            updateResultText(cipherResultText)
+            
             
             setScanStatusLabel("Checking for Heartbleed")
             heartbleed = heartbleed_test.HeartbleedTest(res, host, port)
@@ -259,6 +273,14 @@ class BurpExtender(IBurpExtender, ITab):
             crimeResultText = res.printResult('crime_tls')
             updateResultText(crimeResultText)
             
+
+            setScanStatusLabel("Checking for BREACH")
+            breach = breach_test.BreachTest(res, host, 443)
+            breach.start(self._callbacks, self._helpers)
+            breachResultText = res.printResult('breach')
+            updateResultText(breachResultText)
+
+
             setScanStatusLabel("Checking for BEAST")
             beast = beast_test.BeastTest(res, host, port)
             beast.start()
@@ -266,37 +288,12 @@ class BurpExtender(IBurpExtender, ITab):
             updateResultText(beastResultText)
 
 
-            setScanStatusLabel("Checking for Cipherlist")
-            cipher = cipher_test.CipherTest(res, host, port)
-            cipher.start()
-            cipherResultText = '<h3>Available ciphers:</h3>' + \
-                '<ul><li>' + res.printResult('cipher_NULL') + '</li>' + \
-                '<li>' + res.printResult('cipher_ANON') + '</li>' + \
-                '<li>' + res.printResult('cipher_EXP') + '</li>' + \
-                '<li>' + res.printResult('cipher_LOW') + '</li>' + \
-                '<li>' + res.printResult('cipher_WEAK') + '</li>' + \
-                '<li>' + res.printResult('cipher_3DES') + '</li>' + \
-                '<li>' + res.printResult('cipher_HIGH') + '</li>' + \
-                '<li>' + res.printResult('cipher_STRONG') + '</li></ul>' 
-            updateResultText(cipherResultText)
-            
-
             setScanStatusLabel("Checking for LOGJAM")
             logjam = logjam_test.LogjamTest(res, host, port)
             logjam.start()
             logjamResultText = res.printResult('logjam_export') + '<br />' + res.printResult('logjam_common') 
             updateResultText(logjamResultText)
-
-
-
-
-            '''
-            setScanStatusLabel("Checking for BREACH")
-            breach = breach_test.BreachTest(res, host, 443)
-            breach.start(self._callbacks, self._helpers)
-            breachResultText = res.printResult('breach')
-            updateResultText(breachResultText)
-            '''
+            
 
             updateResultText('<h2>Finished scanning</h2><br /><hr /><br /><h2>Summary</h2>')
 

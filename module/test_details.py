@@ -211,7 +211,17 @@ POSSIBLE_TESTS = {
     'breach' : {
         'internalType': 15,
         'name': 'BREACH',
-        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>']
+        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: orange;">Potentially vulnerable</b>'],
+        'severity': 'Medium',
+        'confidence': 'Tentative',
+        'issueBackground': \
+            ("Server offer HTTP compression which can lead to chosen plaintext attack similar to CRIME where "
+            "the attack can recover secret cookie such as authentication cookie using the size "
+            "of compressed request/response. "
+            "This issue can be ignored if there is no secret in the page or static pages."), 
+
+        'remediationBackground': \
+            ("Disable HTTP compression on the server or ignored if there is no secret in the page."), 
     },
     'cipher_NULL' : {
         'internalType': 16,

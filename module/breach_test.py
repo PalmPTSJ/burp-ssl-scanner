@@ -1,4 +1,8 @@
-
+from java.net import URL
+from java.io import InputStream, InputStreamReader, BufferedReader 
+from javax.net.ssl import HttpsURLConnection, HostnameVerifier, TrustManager, X509TrustManager, SSLContext, SSLSession
+from java.security.cert import X509Certificate
+from java.security import SecureRandom
 
 class BreachTest :
     def __init__(self, result, host, port) :
@@ -6,51 +10,48 @@ class BreachTest :
         self._host = host
         self._port = port
     
-    def testPage(self, page, callback, helpers, depth) :
-        if depth >= 10 :
-            print("Too many redirection ...")
-            return False
+    def testPage(self, page) :
 
-        print("Getting", page)
+        class MyTrustManager(X509TrustManager) :
+            def getAcceptedIssuers(self) :
+                return None
+            
+            def checkClientTrusted(self, certs, auth) :
+                pass
+            
+            def checkServerTrusted(self, certs, auth) :
+                pass
 
-        request = 'GET %s HTTP/1.1\r\n' % page
-        request += 'Host: %s\r\n' % self._host
+        trustAllCerts = [MyTrustManager()]
 
-        if 'google' in self._host : 
-            referer = 'https://yandex.ru/'
-        else : 
-            referer = 'https://google.com/'
+        sc = SSLContext.getInstance("SSL")
+        sc.init(None, trustAllCerts, SecureRandom())
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
 
-        request += 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0\r\n'
-        request += 'Referer: %s\r\n' % referer
-        request += 'Connection: Close\r\nAccept-encoding: gzip,deflate,compress\r\nAccept: text/*\r\n\r\n'
+        class MyHostnameVerifier (HostnameVerifier) :
+            def verify(self, host, sess) :
+                return True
 
-        print request
+        HttpsURLConnection.setDefaultHostnameVerifier(MyHostnameVerifier())
 
-        res = callback.makeHttpRequest(self._host, self._port, True, helpers.stringToBytes(request))
-        res = helpers.analyzeResponse(res)
+        httpsURL = 'https://%s:%s/%s' % (self._host, self._port, page)
+        url = URL(httpsURL)
+        conn = url.openConnection()
+        conn.setRequestProperty("Accept-encoding", 'gzip,deflate,compress')
+        conn.setRequestProperty("User-agent", 'https://google.com/' if 'google' not in self._host else 'https://yandex.ru/') # Use foreign referer
 
-        print res.getHeaders()
-        if res.getStatusCode() == 302 :
-            # Follow redirection
-            for header in res.getHeaders() :
-                if len(header) <= 10 : continue
-                headerLowercase = str(header.lower())
-                if headerLowercase.find('location: ') == 0 :
-                    return self.testPage(header[10:], callback, helpers, depth+1)
-            print("Can't find redirection")
-            return False
-        else :
-            for header in res.getHeaders() :
-                if len(header) <= 18 : continue
-                headerLowercase = str(header.lower())
-                if headerLowercase.find('Content-Encoding: ') == 0 :
-                    return True
+        #ist = conn.getInputStream()
+        #isr = InputStreamReader(ist)
+        #br = BufferedReader(isr)
+        print("[BREACH] Received response: %d" % conn.getResponseCode())
+        if conn.getContentEncoding() != None :
+            print("[BREACH] Received Content-encoding: %s" % (conn.getContentEncoding()))
+            return True
         return False
 
     def start(self, callback, helpers) : # Need HTTP service from Burp
 
-        self._result.addResult('breach', self.testPage('/', callback, helpers, 0))
+        self._result.addResult('breach', self.testPage('/'))
         if self._result.getResult('breach') :
             # Use HTTP Compression
             self._result.addVulnerability('breach')
