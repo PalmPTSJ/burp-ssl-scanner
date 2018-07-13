@@ -6,6 +6,12 @@ class SupportedCipherTest :
         self._result = result
         self._host = host
         self._port = port
+        self.supportedCipherSuites = {}
+        self.supportedCipherSuites['SSLv2.0'] = []
+        self.supportedCipherSuites['SSLv3.0'] = []
+        self.supportedCipherSuites['TLSv1.0'] = []
+        self.supportedCipherSuites['TLSv1.1'] = []
+        self.supportedCipherSuites['TLSv1.2'] = []
     
     def testSSL2(self, cipher) :
         # No easy SSLv2 hello
@@ -50,7 +56,8 @@ class SupportedCipherTest :
                 'byte' : ''.join([i[2:] for i in byte.split(',')]).lower(),
                 'name_ossl' : name_openssl,
                 'name_rfc' : name_rfc,
-                'name' : name_openssl if name_rfc == '-' else name_rfc
+                'name' : name_openssl if name_openssl != '-' else name_rfc,
+                'vulnerabilities': []
             }
 
             if len(cipher['byte']) == 6 :
@@ -70,11 +77,11 @@ class SupportedCipherTest :
             for cipher in ciphers_ssl2 :
                 if self.testSSL2(cipher['byte']) :
                     toRet += '    '+cipher['name'] + '\n'
+                    self.supportedCipherSuites['SSLv2.0'].append(cipher)
             print(toRet)
         # test for each tls version
         for version in getSupportedTLSVersion(self._result) :
             toRet = "%s:\n" % versionIntToString(version)
-
             # split into bundle of 100 ciphers
             for i in range(0, len(ciphers_tls), 100) :
                 ciphers = [x['byte'] for x in ciphers_tls[i:i+100]]
@@ -82,4 +89,7 @@ class SupportedCipherTest :
                 supportedCipher = getSupportedCipher(self._host, self._port, version, ciphers)
                 for cipher in supportedCipher :
                     toRet += '    '+ciphers_dict[cipher]['name'] + '\n'
+                    self.supportedCipherSuites[versionIntToString(version)].append(ciphers_dict[cipher])
             print(toRet)
+        
+        self._result.addResult('supported_ciphers', self.supportedCipherSuites)

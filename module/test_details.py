@@ -133,7 +133,7 @@ POSSIBLE_TESTS = {
              "(SSL Scanner will report if there is no support for TLS_FALLBACK_SCSV). "
              "<b>Also, SSLv3 should never be offered.</b> "
              "<ul><li>For <b>Internet Explorer 6</b>, there is an option to <b>disable SSLv3 and "
-             "enable TLS1.0</b>. However, it is only advisable as a <b>workaround.</b></li></ul>")
+             "enable TLS1.0</b>. However, it is only advisable as a <b>workaround.</b></li></ul>"),
     },
     'sweet32': {
         'internalType': 10,
@@ -292,5 +292,15 @@ POSSIBLE_TESTS = {
             ("Disable SSLv3 and TLS1.0 if possible. "
             "Check for TLS_FALLBACK_SCSV support to prevent downgrade attack."
             "Disable CBC ciphers and use more secure ciphers that are supported in higher protocol.")
+    },
+    'supported_ciphers' : {
+        'internalType': 25,
+        'name': 'Supported Cipher Suites',
+        'result': ['', ''],
+        'severity': 'Information',
+        'confidence': 'Firm',
+        'issueBackground': \
+            ("The list of the cipher suites supported by this host is as follows:"),
+        'remediationBackground': None
     }
 }
