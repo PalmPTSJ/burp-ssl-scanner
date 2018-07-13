@@ -17,13 +17,15 @@ _by [kheminw](https://github.com/kheminw) and [PalmPTSJ](https://github.com/Palm
 - CCS Injection
 - TLS_FALLBACK_SCSV support
 - POODLE (SSLv3)
-- SWEET32
+- Sweet32
 - DROWN
 - FREAK
 - LUCKY13
 - CRIME (TLS Compression)
 - BEAST
 - Check for weak ciphers
+- BREACH
+- Logjam
 
 ## Credits
 

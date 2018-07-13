@@ -190,9 +190,10 @@ class BurpExtender(IBurpExtender, ITab):
                 updateResultText("<h2>Scan terminated (Connection failed)</h2>")
                 raise BaseException('Connection failed')
 
-            setScanStatusLabel("Checking for supported cipher suites")
+            setScanStatusLabel("Checking for supported cipher suites (This can take a long time)")
             supportedCipher = supportedCipher_test.SupportedCipherTest(res, host, port)
             supportedCipher.start()
+
 
             setScanStatusLabel("Checking for Cipherlist")
             cipher = cipher_test.CipherTest(res, host, port)
@@ -208,7 +209,7 @@ class BurpExtender(IBurpExtender, ITab):
                 '<li>' + res.printResult('cipher_STRONG') + '</li></ul>' 
             updateResultText(cipherResultText)
             
-            
+
             setScanStatusLabel("Checking for Heartbleed")
             heartbleed = heartbleed_test.HeartbleedTest(res, host, port)
             heartbleed.start()

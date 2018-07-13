@@ -1,5 +1,6 @@
 from util import *
 from TLS_protocol import ClientHello, intToHex
+import copy
 
 class SupportedCipherTest :
     def __init__(self, result, host, port) :
@@ -77,7 +78,7 @@ class SupportedCipherTest :
             for cipher in ciphers_ssl2 :
                 if self.testSSL2(cipher['byte']) :
                     toRet += '    '+cipher['name'] + '\n'
-                    self.supportedCipherSuites['SSLv2.0'].append(cipher)
+                    self.supportedCipherSuites['SSLv2.0'].append(copy.deepcopy(cipher))
             print(toRet)
         # test for each tls version
         for version in getSupportedTLSVersion(self._result) :
@@ -89,7 +90,7 @@ class SupportedCipherTest :
                 supportedCipher = getSupportedCipher(self._host, self._port, version, ciphers)
                 for cipher in supportedCipher :
                     toRet += '    '+ciphers_dict[cipher]['name'] + '\n'
-                    self.supportedCipherSuites[versionIntToString(version)].append(ciphers_dict[cipher])
+                    self.supportedCipherSuites[versionIntToString(version)].append(copy.deepcopy(ciphers_dict[cipher]))
             print(toRet)
         
         self._result.addResult('supported_ciphers', self.supportedCipherSuites)

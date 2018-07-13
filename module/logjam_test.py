@@ -2,7 +2,7 @@
 dh_export = '0063006500140011'
 all_dh_ciphers = "cc1500b30091c09700a3009fccaac0a3c09f006b006a0039003800c400c30088008700a7006d003a00c5008900abccadc0a7c043c045c047c053c057c05bc067c06dc07dc081c085c09100a2009ec0a2c09e00aac0a6006700400033003200be00bd009a00990045004400a6006c003400bf009b004600b20090c096c042c044c046c052c056c05ac066c06cc07cc080c084c09000660018008e00160013001b008f006300150012001a0065001400110019001700b500b4002d"
 
-from util import tryHandshake, getSupportedTLSVersion, sendData, addNecessaryExtensionToHelloObject
+from util import *
 from TLS_protocol import ClientHello, intToHex
 import socket
 
@@ -36,6 +36,8 @@ class LogjamTest :
             if tryHandshake(self._host, self._port, hello.createAsHex()) == version :
                 # vulnerable,
                 vuln = True
+                for cipherHex in splitCipherHexStringTLS(dh_export) :
+                    self._result.addVulnerabilityToCipher(cipherHex, versionIntToString(version), '<b style="color:red;">LOGJAM</b>')
         
         self._result.addResult('logjam_export', vuln)
         if vuln :
@@ -64,7 +66,7 @@ class LogjamTest :
                     while len(recvBuffer) >= 5 :
                         if ord(recvBuffer[0]) == 0x15 :
                             # Alert ...
-                            #print("[LOGJAM] Received some ALERT")
+                            print("[LOGJAM] Received some ALERT")
                             breakConnection = True
                         elif ord(recvBuffer[0]) == 0x16 :
                             # Handshake message
@@ -75,35 +77,41 @@ class LogjamTest :
                             if len(recvBuffer) >= 5 + messageLen :
                                 # consume !
                                 #print("[LOGJAM] Consuming handshake message")
-                                handshakeMessage, recvBuffer = recvBuffer[5:5+messageLen], recvBuffer[5+messageLen:]
+                                recordHeader, messageBuffer, recvBuffer = recvBuffer[0:5], recvBuffer[5:5+messageLen], recvBuffer[5+messageLen:]
+                                while len(messageBuffer)>=6 :
+                                    #print("[LOGJAM] Message Buffer %d" % len(messageBuffer))
+                                    msgLen = int(messageBuffer[1:4].encode('hex'), 16) + 4 # ([P][LEN]<msgLen>)
+                                    #print("[LOGJAM] Message length %d" % msgLen)
+                                    handshakeMessage, messageBuffer = messageBuffer[0:msgLen], messageBuffer[msgLen:]
+                                    # Check protocol
+                                    if ord(handshakeMessage[0]) == 0x0c :
+                                        print("[LOGJAM] Received KeyExchange")
+                                        # Key exchange protocol
+                                        msgLen = int(handshakeMessage[1:4].encode('hex'), 16)
+                                        pLen = int(handshakeMessage[4:6].encode('hex'),16)
+                                        p = handshakeMessage[6:6 + pLen].encode('hex')
 
-                                # Check protocol
-                                if ord(handshakeMessage[0]) == 0x0c :
-                                    print("[LOGJAM] Received KeyExchange")
-                                    # Key exchange protocol
-                                    msgLen = int(handshakeMessage[1:4].encode('hex'), 16)
-                                    pLen = int(handshakeMessage[4:6].encode('hex'),16)
-                                    p = handshakeMessage[6:6 + pLen].encode('hex')
+                                        print("prime : %s" % p)
+                                        # Check with common prime list
+                                        if p in self.commonPrime :
+                                            print("[LOGJAM] Found common prime : %s (%d-bit)" % (self.commonPrime[p], len(p)*4))
+                                            if len(p)*4 <= 1024 :
+                                                vuln = True
 
-                                    print("prime : %s" % p)
-                                    # Check with common prime list
-                                    if p in self.commonPrime :
-                                        print("[LOGJAM] Found common prime : %s (%d-bit)" % (self.commonPrime[p], len(p)*4))
-                                        if len(p)*4 <= 1024 :
-                                            vuln = True
-
+                                        else :
+                                            print("[LOGJAM] Common prime not found")
+                                        breakConnection = True
+                                    elif ord(handshakeMessage[0]) == 0x0e :
+                                        print("[LOGJAM] Received ServerHelloDone")
+                                        breakConnection = True
+                                    elif ord(handshakeMessage[0]) == 0x0b :
+                                        print("[LOGJAM] Received Certificate")
+                                        pass
+                                    elif ord(handshakeMessage[0]) == 0x02 :
+                                        pass
+                                        print("[LOGJAM] Received ServerHello")
                                     else :
-                                        print("[LOGJAM] Common prime not found")
-                                    breakConnection = True
-                                elif ord(handshakeMessage[0]) == 0x0e :
-                                    #print("[LOGJAM] Received ServerHelloDone")
-                                    breakConnection = True
-                                elif ord(handshakeMessage[0]) == 0x0b :
-                                    #print("[LOGJAM] Received Certificate")
-                                    pass
-                                elif ord(handshakeMessage[0]) == 0x02 :
-                                    pass
-                                    #print("[LOGJAM] Received ServerHello")
+                                        print("[LOGJAM] Received protocol %d" % ord(handshakeMessage[0]))
                             else :
                                 # Need more data
                                 break

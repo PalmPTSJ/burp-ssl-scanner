@@ -1,4 +1,5 @@
 from test_details import *
+from util import *
 from ssl_issue_details import SSLIssue
 from java.lang import Runnable
 from javax.swing import SwingUtilities
@@ -47,18 +48,32 @@ class Result :
         except KeyError:
             return "Test does not exist"
     
-    def printCipherList(self, vuln=None) :
+    def addVulnerabilityToCipher(self, cipherHex, versionString, vuln) :
+        cipherList = self.getResult('supported_ciphers')[versionString]
+        print("Adding",cipherHex,versionString,vuln)
+        for cipher in cipherList :
+            if cipher['byte'] == cipherHex :
+                cipher['vulnerabilities'].append(vuln)
+                break
+
+    def printCipherList(self) :
         try:
             resultList = ""
-            for protocol in self.getResult('supported_ciphers'):    
+            for protocol in ['SSLv2.0', 'SSLv3.0', 'TLSv1.0', 'TLSv1.1', 'TLSv1.2']:  
+                if protocol not in self.getResult('supported_ciphers') :
+                    continue  
+
                 if(len(self.getResult('supported_ciphers')[protocol]) > 0):
-                    resultList += protocol + "<br /><ul><li>" \
-                    + "</li><li>".join([cipher['name'] for cipher in self.getResult('supported_ciphers')[protocol]]) \
-                    + "</li></ul>"
-            print(resultList)
+                    resultList += "<b>" + protocol + "</b><br /><ul>"
+                    for cipher in self.getResult('supported_ciphers')[protocol] :
+                        if len(cipher['vulnerabilities']) == 0 :
+                            resultList += "<li>%s</li>"  % cipher['name']
+                        else :
+                            resultList += "<li>%s: %s</li>"  % (cipher['name'], ' '.join(cipher['vulnerabilities']))
+                    resultList += "</ul>"
+            #print(resultList)
             # check if we are printing the full list for the summary
-            if (vuln is None):
-                self.addVulnerability('supported_ciphers', resultList)
+            self.addVulnerability('supported_ciphers', resultList) # Add information to sitemap
             return resultList
         except:
             return ("The cipher list has not been generated yet.<br />"

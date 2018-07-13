@@ -66,6 +66,20 @@ def getSupportedCipher(host, port, version, ciphers) :
             break
     return toRet
 
+def splitCipherHexStringTLS(cipherHexString) :
+    # Split into each cipher
+    toRet = []
+    for i in range(0,len(cipherHexString),4) :
+        toRet.append(cipherHexString[i:i+4])
+    return toRet
+
+def splitCipherHexStringSSL2(cipherHexString) :
+    # Split into each cipher
+    toRet = []
+    for i in range(0,len(cipherHexString),6) :
+        toRet.append(cipherHexString[i:i+6])
+    return toRet
+
 '''
 def doFullHandshake(host, port, version, hello) :
     # do a full handshake instead of hello (parse all response from server)

@@ -28,3 +28,8 @@ class BeastTest :
         self._result.addResult('beast', vuln)
         if vuln :
             self._result.addVulnerability('beast')
+            for cipherHex in splitCipherHexStringTLS(cbc_cipher) :
+                for supportedVersion in getSupportedTLSVersion(self._result) :
+                    if supportedVersion > 1 : 
+                        continue
+                    self._result.addVulnerabilityToCipher(cipherHex, versionIntToString(supportedVersion), '<b style="color:orange;">BEAST</b>')

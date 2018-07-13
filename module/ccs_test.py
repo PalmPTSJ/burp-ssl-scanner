@@ -421,6 +421,7 @@ def test_ccs(strHost, iPort, strVer):
             try:
                 recv = ''
                 recv = s.recv(20480)
+                #print('[CCS] Received length %d' % (len(recv)))
                 iCount = 0
             except socket.timeout:
                 continue
@@ -437,6 +438,7 @@ def test_ccs(strHost, iPort, strVer):
                         print("[CCS] received unexpected message or handshake failure, OK")
                         fVuln = False
                         break
+            if recv == None : break
         if fVuln:
             # Try sending another data and see if decryption / bad_mac is return (which mean CCS got through)
             fVuln = False
