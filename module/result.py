@@ -12,8 +12,8 @@ class Result :
         self.addToSitemap = addToSitemap
         self.issueList = []
 
-    def addVulnerability(self, issueKey) :
-        print "VULNERABILITY FOUND: [%s]" % (issueKey)
+    def addVulnerability(self, issueKey, additionalInfo = None) :
+        print "VULNERABILITY FOUND: [%s] - %s" % (issueKey, additionalInfo)
 
         # Add issue to summary list
         issue = SSLIssue(issueKey, self.url, self.helpers)

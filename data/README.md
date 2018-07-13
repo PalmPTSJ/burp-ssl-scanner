@@ -1,0 +1,1 @@
+cipher-mapping.txt is from testssl.sh

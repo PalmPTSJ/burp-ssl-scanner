@@ -12,6 +12,7 @@ __all__ = [
     'breach_test',
     'cipher_test',
     'beast_test',
+    'supportedCipher_test',
     
     'result',
     'TLS_protocol',
