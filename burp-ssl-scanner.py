@@ -190,11 +190,13 @@ class BurpExtender(IBurpExtender, ITab):
                 updateResultText("<h2>Scan terminated (Connection failed)</h2>")
                 raise BaseException('Connection failed')
 
-
+            '''
             supportedCipher = supportedCipher_test.SupportedCipherTest(res, host, port)
             supportedCipher.start()
-
             '''
+
+
+            
             setScanStatusLabel("Checking for Heartbleed")
             heartbleed = heartbleed_test.HeartbleedTest(res, host, port)
             heartbleed.start()
@@ -277,7 +279,16 @@ class BurpExtender(IBurpExtender, ITab):
                 '<li>' + res.printResult('cipher_HIGH') + '</li>' + \
                 '<li>' + res.printResult('cipher_STRONG') + '</li></ul>' 
             updateResultText(cipherResultText)
-            '''
+            
+
+            setScanStatusLabel("Checking for LOGJAM")
+            logjam = logjam_test.LogjamTest(res, host, port)
+            logjam.start()
+            logjamResultText = res.printResult('logjam_export') + '<br />' + res.printResult('logjam_common') 
+            updateResultText(logjamResultText)
+
+
+
 
             '''
             setScanStatusLabel("Checking for BREACH")

@@ -154,3 +154,29 @@ class GenericExtension(Extension) :
         Extension.__init__(self, msg[:4])
         # Skip Length (2 bytes)
         self.message = msg[8:]
+
+
+
+'''
+class TLSRecordLayer() :
+
+    TYPE_ALERT = '15' # 0x15
+    TYPE_HANDSHAKE = '16' # 0x16
+
+    def __init__(self, msg) :
+        self.type = ''
+        self.version = 0
+        self.messageLen = 0
+        self.message = None
+
+        if msg != None :
+            self.parseMessage(msg)
+
+    def parseMessage(self, msg) :
+        self.type, msg = consume(msg, 1)
+        tls_version, msg = consume(msg, 2)
+        self.version = int(tls_version[3], 16)
+
+
+
+'''

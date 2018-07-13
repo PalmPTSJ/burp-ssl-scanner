@@ -13,6 +13,7 @@ __all__ = [
     'cipher_test',
     'beast_test',
     'supportedCipher_test',
+    'logjam_test',
     
     'result',
     'TLS_protocol',
