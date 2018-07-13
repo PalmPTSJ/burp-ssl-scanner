@@ -194,7 +194,7 @@ class BurpExtender(IBurpExtender, ITab):
             supportedCipher = supportedCipher_test.SupportedCipherTest(res, host, port)
             supportedCipher.start()
 
-
+            
             setScanStatusLabel("Checking for Cipherlist")
             cipher = cipher_test.CipherTest(res, host, port)
             cipher.start()

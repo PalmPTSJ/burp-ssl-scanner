@@ -27,14 +27,13 @@ class FreakTest :
             # Try ssl2
             # TODO: Test if this is working
             try :
-                data = connection_test.sendData(self._host, self._port, freak_hello_ssl2.decode('hex'))
-                cipherLength = ord(data[9])*256 + ord(data[10])
-                if cipherLength > 0 :
-                    print("[FREAK] Handshake success with SSLv2")
-                    vuln = True
-
-                    for cipherHex in splitCipherHexStringTLS('040080020080') :
-                        self._result.addVulnerabilityToCipher(cipherHex, 'SSLv2.0', '<b style="color:red;">FREAK</b>')
+                #data = connection_test.sendData(self._host, self._port, freak_hello_ssl2.decode('hex'))
+                ssl2cipherList = self._result.getResult('supported_ciphers')['SSLv2.0']
+                for cipher in ssl2cipherList :
+                    if cipher['byte'] == '040080' or cipher['byte'] == '020080' :
+                        print("[FREAK] SSLv2 server cipher vulnerable: %s" % cipher['name'])
+                        vuln = True
+                        self._result.addVulnerabilityToCipher(cipher['byte'], 'SSLv2.0', '<b style="color:red;">FREAK</b>')
             except :
                 print("[FREAK] Something wrong with SSLv2 connection")
         

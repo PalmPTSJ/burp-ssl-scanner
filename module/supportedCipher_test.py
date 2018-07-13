@@ -25,15 +25,34 @@ class SupportedCipherTest :
         hello += cipher
         hello += '61616161616161616161616161616161'
         hello += '61616161616161616161616161616161'
-
+ 
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(3)
         try :
-            data = sendData(self._host, self._port, hello.decode('hex'))
-            cipherLength = ord(data[9])*256 + ord(data[10])
-            if cipherLength > 0:
-                return True
-        except :
-            return False
-        
+            s.connect((self._host, self._port))
+            s.sendall(hello.decode('hex'))
+            recvBuffer = ''
+            while True :
+                rec = s.recv(1024*10)
+                if rec == None : break
+                recvBuffer += rec
+                respLen = (ord(recvBuffer[0]) & 0b00111111)*256 + ord(recvBuffer[1])
+                #print(len(recvBuffer), "expect", respLen)
+                if len(recvBuffer) >= respLen :
+                    # GO
+                    s.close()
+                    certLen = int(recvBuffer[7:9].encode('hex'), 16)
+                    cipherLen = int(recvBuffer[9:11].encode('hex'), 16)
+                    cipherList = recvBuffer[13 + certLen : 13 + certLen + cipherLen].encode('hex')
+                    for cipherHex in splitCipherHexStringSSL2(cipherList) :
+                        if cipherHex == cipher :
+                            return True
+                    return False
+        except BaseException as e :
+            print(e)
+            s.close()
+            pass
+        return False
 
     def testTLS(self, cipher, version) :
         # Easy
@@ -79,7 +98,7 @@ class SupportedCipherTest :
                 if self.testSSL2(cipher['byte']) :
                     toRet += '    '+cipher['name'] + '\n'
                     self.supportedCipherSuites['SSLv2.0'].append(copy.deepcopy(cipher))
-            print(toRet)
+            #print(toRet)
         # test for each tls version
         for version in getSupportedTLSVersion(self._result) :
             toRet = "%s:\n" % versionIntToString(version)
@@ -91,6 +110,6 @@ class SupportedCipherTest :
                 for cipher in supportedCipher :
                     toRet += '    '+ciphers_dict[cipher]['name'] + '\n'
                     self.supportedCipherSuites[versionIntToString(version)].append(copy.deepcopy(ciphers_dict[cipher]))
-            print(toRet)
+            #print(toRet)
         
         self._result.addResult('supported_ciphers', self.supportedCipherSuites)

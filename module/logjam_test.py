@@ -60,13 +60,14 @@ class LogjamTest :
                 recvBuffer = ''
                 while True :
                     rec = s.recv(1024*10)
+                    if rec == None : break
                     recvBuffer += rec
                     # Check for TLS Record
                     breakConnection = False
                     while len(recvBuffer) >= 5 :
                         if ord(recvBuffer[0]) == 0x15 :
                             # Alert ...
-                            print("[LOGJAM] Received some ALERT")
+                            #print("[LOGJAM] Received some ALERT")
                             breakConnection = True
                         elif ord(recvBuffer[0]) == 0x16 :
                             # Handshake message

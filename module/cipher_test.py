@@ -39,25 +39,12 @@ class CipherTest :
     
     def testSSL2(self, cipher) :
         # No easy SSLv2 hello
-        hello = '80'
-        hello += intToHex(3 + 2 + 2 + 2 + len(cipher)//2 + 16 + 16,1)
-        hello += '010002'
-        hello += intToHex(len(cipher)//2,2)
-        hello += '0010' # Session = 16
-        hello += '0010' # Challenge = 16
-        hello += cipher
-        hello += '61616161616161616161616161616161'
-        hello += '61616161616161616161616161616161'
-
-        try :
-            data = sendData(self._host, self._port, hello.decode('hex'))
-            cipherLength = ord(data[9])*256 + ord(data[10])
-            if cipherLength > 0:
-                print("SSL2 success")
-                return True
-        except :
-            print("SSL2 failed")
-            return False
+        ssl2cipherList = self._result.getResult('supported_ciphers')['SSLv2.0']
+        for supportedCipher in ssl2cipherList :
+            for testingCipher in splitCipherHexStringSSL2(cipher) :
+                if supportedCipher['byte'] == testingCipher :
+                    return True
+        return False
         
 
     def testTLS(self, cipher, version) :

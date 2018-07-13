@@ -50,7 +50,7 @@ class Result :
     
     def addVulnerabilityToCipher(self, cipherHex, versionString, vuln) :
         cipherList = self.getResult('supported_ciphers')[versionString]
-        print("Adding",cipherHex,versionString,vuln)
+        #print("Adding",cipherHex,versionString,vuln)
         for cipher in cipherList :
             if cipher['byte'] == cipherHex :
                 cipher['vulnerabilities'].append(vuln)
