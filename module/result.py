@@ -56,6 +56,9 @@ class Result :
                     + "</li><li>".join([cipher['name'] for cipher in self.getResult('supported_ciphers')[protocol]]) \
                     + "</li></ul>"
             print(resultList)
+            # check if we are printing the full list for the summary
+            if (vuln is None):
+                self.addVulnerability('supported_ciphers', resultList)
             return resultList
         except:
             return ("The cipher list has not been generated yet.<br />"

@@ -299,8 +299,7 @@ POSSIBLE_TESTS = {
         'result': ['', ''],
         'severity': 'Information',
         'confidence': 'Firm',
-        'issueBackground': \
-            ("The list of the cipher suites supported by this host is as follows:"),
+        'issueBackground': None,
         'remediationBackground': None
     },
     'logjam_export' : {
