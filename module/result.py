@@ -7,6 +7,7 @@ class Result :
     
     def __init__(self, url, callbacks, helpers, addToSitemap):
         self._resultDict = {}
+        self._resultDict['ciphers_by_vulns'] = {}
         self.url = url
         self.callbacks = callbacks
         self.helpers = helpers
@@ -54,6 +55,9 @@ class Result :
         for cipher in cipherList :
             if cipher['byte'] == cipherHex :
                 cipher['vulnerabilities'].append(vuln)
+                if not (vuln in self._resultDict['ciphers_by_vulns']):
+                    self._resultDict['ciphers_by_vulns'][vuln] = []
+                self._resultDict['ciphers_by_vulns'][vuln].append(cipher['name'] + ("(%s)" % versionString))
                 break
 
     def printCipherList(self) :
@@ -76,6 +80,20 @@ class Result :
             self.addVulnerability('supported_ciphers', resultList) # Add information to sitemap
             return resultList
         except:
+            return ("The cipher list has not been generated yet.<br />"
+                    "An error might have occurred during the cipher enumeration stage.")
+
+    def printCipherListByVulns(self):
+        try:
+            resultList = ""
+            for vuln in self._resultDict['ciphers_by_vulns']:
+                resultList += "<b>" + vuln + "</b><br /><ul>"
+                for cipher in self._resultDict['ciphers_by_vulns'][vuln]:
+                    resultList += "<li>%s</li>" % cipher
+                resultList += "</ul>"
+            return resultList
+        except BaseException as e:
+            print e
             return ("The cipher list has not been generated yet.<br />"
                     "An error might have occurred during the cipher enumeration stage.")
 

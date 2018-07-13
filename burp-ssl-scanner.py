@@ -296,8 +296,10 @@ class BurpExtender(IBurpExtender, ITab):
 
             updateResultText('<h2>Finished scanning</h2><br /><hr /><br /><h2>Summary</h2>')
 
-            updateResultText('<h2>Supported ciphers</h2>')
+            updateResultText('<h2>Supported ciphers (by Protocol)</h2>')
             updateResultText(res.printCipherList())
+            updateResultText('<h2>Supported ciphers (by Vulnerability)</h2>')
+            updateResultText(res.printCipherListByVulns())
 
             updateResultText('<h2>Issues found</h2>')
             updateResultText(res.printAllIssue())
