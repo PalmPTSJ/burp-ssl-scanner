@@ -12,7 +12,8 @@ class Result :
         self.callbacks = callbacks
         self.helpers = helpers
         self.addToSitemap = addToSitemap
-        self.issueList = []
+        self.issueList = [] # Issue list as string (HTML)
+        self.sslIssueList = [] # Issue list as SSLIssue to return to Burp scanner
 
     def addVulnerability(self, issueKey, additionalInfo = None) :
         print "TEST FOUND: [%s] - %s" % (issueKey, additionalInfo)
@@ -21,6 +22,8 @@ class Result :
         issue = SSLIssue(issueKey, self.url, self.helpers)
         if not (additionalInfo is None):
             issue.setIssueDetail(additionalInfo)
+
+        self.sslIssueList.append(issue)
         self.issueList.append('<li>[%s] %s</li>' % (issue.getSeverity(), issue.getIssueName().replace('[SSL Scanner] ','')))
 
         # Add to Burp issue
@@ -39,6 +42,9 @@ class Result :
                 SwingUtilities.invokeLater(
                         ScannerRunnable(self.callbacks.addScanIssue, (issue, ))
                 )
+
+    def getAllSSLIssue(self) :
+        return self.sslIssueList
 
     def printAllIssue(self) :
         return  '<ul>' + ''.join(self.issueList) + '</ul>'

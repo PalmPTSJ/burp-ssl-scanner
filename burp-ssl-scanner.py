@@ -28,6 +28,8 @@ try:
 
     import time
 
+    import json
+
     from module import *
 
 except ImportError as e:
@@ -115,6 +117,10 @@ class BurpExtender(IBurpExtender, ITab):
         self.saveButton.setEnabled(False)
         self.savePanel.add(self.saveButton)
 
+        self.clearScannedHostButton = JButton('Clear scanned host', actionPerformed=self.clearScannedHost)
+        self.savePanel.add(self.clearScannedHostButton)
+        self.savePanel.add(JLabel("Clear hosts that were scanned by active scan to enable rescanning", SwingConstants.LEFT))
+
         self._bottomPanel.add(self.savePanel, BorderLayout.PAGE_END)
 
         self._splitpane.setBottomComponent(self._bottomPanel)
@@ -123,13 +129,24 @@ class BurpExtender(IBurpExtender, ITab):
 
         callbacks.addSuiteTab(self)
         
-        print "Burp SSL Scanner loaded"
+        print "SSL Scanner tab loaded"
+
 
         self.scannerMenu = ScannerMenu(self)
         callbacks.registerContextMenuFactory(self.scannerMenu)
         print "SSL Scanner custom menu loaded"
 
-        print 'Done'
+
+        self.scannerCheck = ScannerCheck(self)
+        callbacks.registerScannerCheck(self.scannerCheck)
+        print "SSL Scanner check registered"
+
+
+        self.scannedHost = []
+
+
+
+        print 'SSL Scanner loaded'
         
     def startScan(self, ev) :
 
@@ -158,18 +175,23 @@ class BurpExtender(IBurpExtender, ITab):
             print(e)
             return
 
-    def scan(self, url):
+    def scan(self, url, usingBurpScanner=False):
 
         def setScanStatusLabel(text) :
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.scanStatusLabel.setText, 
-                                (text,)))
+            if not usingBurpScanner :
+                SwingUtilities.invokeLater(
+                    ScannerRunnable(self.scanStatusLabel.setText, 
+                                    (text,)))
                                 
         def updateResultText(text) :
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.updateText, (text, )))
+            if not usingBurpScanner :
+                SwingUtilities.invokeLater(
+                    ScannerRunnable(self.updateText, (text, )))
 
-        res = result.Result(url, self._callbacks, self._helpers, self.addToSitemapCheckbox.isSelected())
+        if usingBurpScanner :
+            res = result.Result(url, self._callbacks, self._helpers, False)
+        else :
+            res = result.Result(url, self._callbacks, self._helpers, self.addToSitemapCheckbox.isSelected())
 
         host, port = url.getHost(), url.getPort()
 
@@ -306,26 +328,27 @@ class BurpExtender(IBurpExtender, ITab):
 
         except BaseException as e :
             print(e)
-            SwingUtilities.invokeLater(
-                ScannerRunnable(self.scanStatusLabel.setText, 
-                                ("An error occurred. Please refer to the output/errors tab for more information.",)))
+            setScanStatusLabel("An error occurred. Please refer to the output/errors tab for more information.")
             time.sleep(2)
 
-        self.scanningEvent.clear()
-        SwingUtilities.invokeLater(
-                ScannerRunnable(self.toggleButton.setEnabled, (True, ))
-        )
-        SwingUtilities.invokeLater(
-                ScannerRunnable(self.hostField.setEnabled, (True, ))
-        )
-        SwingUtilities.invokeLater(
-                ScannerRunnable(self.saveButton.setEnabled, (True, ))
-        )
-        if 'Professional' in self._callbacks.getBurpVersion()[0] :
+        if usingBurpScanner :
+            return res.getAllSSLIssue()
+        else :
+            self.scanningEvent.clear()
             SwingUtilities.invokeLater(
-                ScannerRunnable(self.addToSitemapCheckbox.setEnabled, (True, ))
+                    ScannerRunnable(self.toggleButton.setEnabled, (True, ))
             )
-        setScanStatusLabel("Ready to scan")
+            SwingUtilities.invokeLater(
+                    ScannerRunnable(self.hostField.setEnabled, (True, ))
+            )
+            SwingUtilities.invokeLater(
+                    ScannerRunnable(self.saveButton.setEnabled, (True, ))
+            )
+            if 'Professional' in self._callbacks.getBurpVersion()[0] :
+                SwingUtilities.invokeLater(
+                    ScannerRunnable(self.addToSitemapCheckbox.setEnabled, (True, ))
+                )
+            setScanStatusLabel("Ready to scan")
         print("Finished scanning")
 
     def updateText(self, stringToAppend):
@@ -345,6 +368,12 @@ class BurpExtender(IBurpExtender, ITab):
             fw.flush()
             fw.close()
             print "Saved results to disk"
+
+    def clearScannedHost(self, event) :
+        self.scannedHost = []
+
+    def addHostToScannedList(self, host, port) :
+        self.scannedHost.append([host, port])
 
     def getTabCaption(self):
         return "SSL Scanner"
@@ -381,6 +410,42 @@ class ScannerMenu(IContextMenuFactory):
                 self.scannerInstance._callbacks.issueAlert(
                     "The selected request is null.")
 
+
+class ScannerCheck(IScannerCheck) :
+    def __init__(self, scannerInstance) :
+        self.scannerInstance = scannerInstance
+
+    def doActiveScan(self, baseReqRes, insPoint) :
+        # Get URL from request and check if the host has already been scanned by our tool
+        httpService = baseReqRes.getHttpService()
+        host, port, protocol = httpService.getHost(), httpService.getPort(), httpService.getProtocol()
+
+        print "[SSL Scanner] Do active scan: ",host,port,protocol
+        # Check if already scanned
+        for scannedHost, scannedPort in self.scannerInstance.scannedHost :
+            if scannedHost == host and scannedPort == port :
+                print "[SSL Scanner] The host has already been scanned, aborting"
+                self.scannerInstance._callbacks.issueAlert("The host %s:%d has already been scanned (Use [Clear scanned host] button to enable rescanning)" % (host, port))
+                break
+        else :
+            self.scannerInstance.addHostToScannedList(host, port)
+            self.scannerInstance._callbacks.issueAlert("Scanning %s:%d" % (host, port))
+            issues = self.scannerInstance.scan(URL(protocol, host, port, "/"), True)
+            self.scannerInstance._callbacks.issueAlert("Scan finished for %s:%d" % (host, port))
+
+            return issues
+        return None
+    
+    def doPassiveScan(self, baseReqRes) :
+        print "[SSL Scanner] Do passive scan"
+        return None
+
+    def consolidateDuplicateIssues(self, old, new) :
+        if old.getIssueName() == new.getIssueName() :
+            return 1 # Use only new issue
+        return 0 # Use both issue
+
+
 class ScannerRunnable(Runnable):
     def __init__(self, func, args):
         self.func = func
@@ -388,3 +453,4 @@ class ScannerRunnable(Runnable):
 
     def run(self):
         self.func(*self.args)
+
