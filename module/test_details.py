@@ -142,7 +142,7 @@ POSSIBLE_TESTS = {
         'severity': 'Medium',
         'confidence': 'Firm',
         'issueBackground': \
-            ("Server offer ciphers with block size of 64 bits which "
+            ("This server offers ciphers with block size of 64 bits which "
             "is vulnerable to birthday attack using reasonable amount "
             "of captured traffic. "
             "<a href='https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-2183'>(CVE-2016-2183)</a>"),
@@ -187,7 +187,7 @@ POSSIBLE_TESTS = {
         'severity': 'Low',
         'confidence': 'Tentative',
         'issueBackground': \
-            ("Server offer ciphers with CBC mode of operation. Some implementation do not " 
+            ("This server offers ciphers with CBC mode of operation. Some implementation do not " 
             "properly consider timing side-channel attack on a MAC check requirement. "
             "Please check if the version of the software is vulnerable to LUCKY13 or not. " 
             "<a href='https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2013-0169'>(CVE-2013-0169)</a>"), 
@@ -201,7 +201,7 @@ POSSIBLE_TESTS = {
         'severity': 'Low',
         'confidence': 'Certain',
         'issueBackground': \
-            ("Server offer TLS compression which can lead to chosen plaintext attack where "
+            ("This server offers TLS compression which can lead to chosen plaintext attack where "
             "the attack can recover secret cookie such as authentication cookie using the size "
             "of compressed request/response. "
             "<a href='https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2012-4929'>(CVE-2012-4929)</a>"), 
@@ -215,7 +215,7 @@ POSSIBLE_TESTS = {
         'severity': 'Medium',
         'confidence': 'Tentative',
         'issueBackground': \
-            ("Server offer HTTP compression which can lead to chosen plaintext attack similar to CRIME where "
+            ("This server offers HTTP compression which can lead to chosen plaintext attack similar to CRIME where "
             "the attack can recover secret cookie such as authentication cookie using the size "
             "of compressed request/response. "
             "This issue can be ignored if there is no secret in the page or static pages."), 
@@ -229,7 +229,7 @@ POSSIBLE_TESTS = {
         'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'High',
         'confidence': 'Certain',
-        'issueBackground': 'Server offer null ciphers which does not encrypt the data at all',
+        'issueBackground': 'This server offers null ciphers which does not encrypt the data at all',
         'remediationBackground': 'Disable null ciphers on the server.'
     },
     'cipher_ANON' : {
@@ -238,7 +238,7 @@ POSSIBLE_TESTS = {
         'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'High',
         'confidence': 'Certain',
-        'issueBackground': 'Server offer anonymous ciphers which can lead to Man in the Middle attack',
+        'issueBackground': 'This server offers anonymous ciphers which can lead to Man in the Middle attack',
         'remediationBackground': 'Disable anonymous ciphers on the server.'
     },
     'cipher_EXP' : {
@@ -247,7 +247,7 @@ POSSIBLE_TESTS = {
         'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'High',
         'confidence': 'Certain',
-        'issueBackground': 'Server offer export ciphers which is insecure.',
+        'issueBackground': 'This server offers export ciphers which is insecure.',
         'remediationBackground': 'Disable export ciphers on the server.'
     },
     'cipher_LOW' : {
@@ -256,7 +256,7 @@ POSSIBLE_TESTS = {
         'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'Medium',
         'confidence': 'Certain',
-        'issueBackground': 'Server offer low strength ciphers (64 bit + DES).',
+        'issueBackground': 'This server offers low strength ciphers (64 bit + DES).',
         'remediationBackground': 'Disable low strength ciphers (64 bit + DES) on the server.'
     },
     'cipher_WEAK' : {
@@ -265,7 +265,7 @@ POSSIBLE_TESTS = {
         'result': ['<b style="color: green;">No</b>', '<b style="color: red;">Yes (not OK)</b>'],
         'severity': 'Medium',
         'confidence': 'Certain',
-        'issueBackground': 'Server offer weak ciphers (SEED, IDEA, RC2, RC4).',
+        'issueBackground': 'This server offers weak ciphers (SEED, IDEA, RC2, RC4).',
         'remediationBackground': 'Disable weak ciphers (SEED, IDEA, RC2, RC4) on the server.'
     },
     'cipher_3DES' : { # Not recommended
@@ -274,7 +274,7 @@ POSSIBLE_TESTS = {
         'result': ['<b style="color: green;">No</b>', '<b style="color: orange;">Yes (not recommended)</b>'],
         'severity': 'Information',
         'confidence': 'Certain',
-        'issueBackground': 'Server offer 3DES ciphers which are prone to birthday attack (Sweet32).',
+        'issueBackground': 'This server offers 3DES ciphers which are prone to birthday attack (Sweet32).',
         'remediationBackground': 'Disable 3DES ciphers on the server.'
     },
     'cipher_HIGH' : { # Not an issue
@@ -294,7 +294,7 @@ POSSIBLE_TESTS = {
         'severity': 'Medium',
         'confidence': 'Tentative',
         'issueBackground': \
-            ("Server offer CBC ciphers with SSLv3 or TLS1.0. "
+            ("This server offers CBC ciphers with SSLv3 or TLS1.0. "
             "which allows man-in-the-middle attackers to obtain plaintext HTTP headers "
             "via a blockwise chosen-boundary attack (BCBA) on an HTTPS session. "
             "<a href='https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2011-3389'>(CVE-2011-3389)</a>"), 
@@ -319,7 +319,7 @@ POSSIBLE_TESTS = {
         'severity': 'High',
         'confidence': 'Certain',
         'issueBackground': \
-            ("Server offer DHE_EXPORT cipher which is insecure. "),
+            ("This server offers DHE_EXPORT cipher which is insecure. "),
         'remediationBackground': \
             ("Disable DHE_EXPORT cipher. ")
     },
@@ -330,7 +330,7 @@ POSSIBLE_TESTS = {
         'severity': 'Medium',
         'confidence': 'Certain',
         'issueBackground': \
-            ("Server offer Diffie-Hellman key exchange with common prime number whose size is 1024-bit or less. "
+            ("This server offers Diffie-Hellman key exchange with common prime number whose size is 1024-bit or less. "
             "Attackers can do precomputation using only this prime to quickly break individual connections. "
             "It is suspected that the prime can be broken by nation-level agencies. "), 
         'remediationBackground': \
