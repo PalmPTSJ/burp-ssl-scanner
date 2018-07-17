@@ -340,3 +340,25 @@ POSSIBLE_TESTS = {
             ("Configure the server to use a 2048-bit Diffie-Hellman group. ")
     }
 }
+
+
+# Text to print for each scan accuracy setting
+SCANNING_ACCURACY_INFO = {
+    'minimise_false_negatives' : 
+        '''
+        <ul>
+            <li><b>[LUCKY13]</b> Vulnerability will not be reported on the cipher list and scanner issue because \
+            the test couldn't determined if the server was patched or not.</li>
+        </ul>
+        ''',
+    'normal' : '',
+    'minimise_false_positives' : ''
+}
+
+
+# Text to print for each scan speed setting
+SCANNING_SPEED_INFO = {
+    'fast' : '',
+    'normal' : '',
+    'thorough' : ''
+}

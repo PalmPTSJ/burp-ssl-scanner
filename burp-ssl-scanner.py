@@ -205,6 +205,8 @@ class BurpExtender(IBurpExtender, ITab):
         # scanSpeed: fast, normal, thorough
         scanSpeed = projectConfig['scanner']['active_scanning_optimization']['scan_speed']
 
+        updateResultText('<h2>Scanning speed: %s</h2> %s' % (scanSpeed, test_details.SCANNING_SPEED_INFO[scanSpeed]))
+        updateResultText('<h2>Scanning accuracy: %s</h2> %s' % (scanAccuracy, test_details.SCANNING_ACCURACY_INFO[scanAccuracy]))
 
         try :
             setScanStatusLabel("Checking for supported SSL/TLS versions")
