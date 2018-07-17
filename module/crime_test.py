@@ -1,12 +1,7 @@
-from util import getHighestTLSVersion, addNecessaryExtensionToHelloObject, getServerHelloObject
+from util import *
 from TLS_protocol import ClientHello
 
-class CrimeTest :
-    def __init__(self, result, host, port) :
-        self._result = result
-        self._host = host
-        self._port = port
-    
+class CrimeTest(Test) :
     def start(self) :
         version = getHighestTLSVersion(self._result)
         if version == -1 :

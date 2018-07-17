@@ -31,12 +31,7 @@ testList = [
     ['STRONG',  strong_ciphers, None,                   False]
 ]
 
-class CipherTest :
-    def __init__(self, result, host, port) :
-        self._result = result
-        self._host = host
-        self._port = port
-    
+class CipherTest(Test) :
     def testSSL2(self, cipher) :
         # No easy SSLv2 hello
         ssl2cipherList = self._result.getResult('supported_ciphers')['SSLv2.0']

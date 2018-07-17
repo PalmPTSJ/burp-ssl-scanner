@@ -6,12 +6,8 @@ from util import *
 from TLS_protocol import ClientHello, intToHex
 import socket
 
-class LogjamTest :
-    def __init__(self, result, host, port) :
-        self._result = result
-        self._host = host
-        self._port = port
-
+class LogjamTest(Test) :
+    def init(self) :
         # load common prime
         self.commonPrime = {}
         commonPrimeFile = open("data/common-primes.txt","r")
@@ -130,7 +126,6 @@ class LogjamTest :
             finally :
                 s.close()
             return vuln
-
 
 
         vuln = False

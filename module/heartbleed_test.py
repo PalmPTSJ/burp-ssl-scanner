@@ -30,7 +30,7 @@ import socket
 import time
 import select
 import struct
-from util import addNecessaryExtensionToHello
+from util import *
 hbv10 = '1803010003014000'
 hbv11 = '1803020003014000'
 hbv12 = '1803030003014000'
@@ -134,12 +134,7 @@ def parseresp(s):
         if typ == 22 and ord(pay[0]) == 0x0E:
             return ver
 
-class HeartbleedTest :
-    def __init__(self, result, host, port) :
-        self._result = result
-        self._host = host
-        self._port = port
-    
+class HeartbleedTest(Test) :
     def start(self) :
         if self._result.getResult('offer_tls12') :
             self._result.addResult('heartbleed',test_heartbleed(self._host, self._port, 3))

@@ -4,11 +4,10 @@ from javax.net.ssl import HttpsURLConnection, HostnameVerifier, TrustManager, X5
 from java.security.cert import X509Certificate
 from java.security import SecureRandom
 from java.net import SocketTimeoutException
-class BreachTest :
-    def __init__(self, result, host, port) :
-        self._result = result
-        self._host = host
-        self._port = port
+
+from util import *
+
+class BreachTest(Test) :
     
     def testPage(self, page) :
 

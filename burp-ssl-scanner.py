@@ -141,10 +141,13 @@ class BurpExtender(IBurpExtender, ITab):
         callbacks.registerScannerCheck(self.scannerCheck)
         print "SSL Scanner check registered"
 
+        projectConfig = json.loads(self._callbacks.saveConfigAsJson())
+        scanAccuracy = projectConfig['scanner']['active_scanning_optimization']['scan_accuracy']
+        scanSpeed = projectConfig['scanner']['active_scanning_optimization']['scan_speed']
+
+        print(scanAccuracy, scanSpeed)
 
         self.scannedHost = []
-
-
 
         print 'SSL Scanner loaded'
         
@@ -195,9 +198,17 @@ class BurpExtender(IBurpExtender, ITab):
 
         host, port = url.getHost(), url.getPort()
 
+        ### Get project configuration
+        projectConfig = json.loads(self._callbacks.saveConfigAsJson())
+        # scanAccuracy: minimise_false_negatives, normal, minimise_false_positives
+        scanAccuracy = projectConfig['scanner']['active_scanning_optimization']['scan_accuracy']
+        # scanSpeed: fast, normal, thorough
+        scanSpeed = projectConfig['scanner']['active_scanning_optimization']['scan_speed']
+
+
         try :
             setScanStatusLabel("Checking for supported SSL/TLS versions")
-            con = connection_test.ConnectionTest(res, host, port)
+            con = connection_test.ConnectionTest(res, host, port, scanSpeed, scanAccuracy)
             con.start()
             conResultText = '<hr /><br /><h3>' + res.printResult('connectable') + '</h3>' + \
                 '<ul><li>' + res.printResult('offer_ssl2') + '</li>' + \
@@ -213,12 +224,12 @@ class BurpExtender(IBurpExtender, ITab):
                 raise BaseException('Connection failed')
 
             setScanStatusLabel("Checking for supported cipher suites (This can take a long time)")
-            supportedCipher = supportedCipher_test.SupportedCipherTest(res, host, port)
+            supportedCipher = supportedCipher_test.SupportedCipherTest(res, host, port, scanSpeed, scanAccuracy)
             supportedCipher.start()
 
             
             setScanStatusLabel("Checking for Cipherlist")
-            cipher = cipher_test.CipherTest(res, host, port)
+            cipher = cipher_test.CipherTest(res, host, port, scanSpeed, scanAccuracy)
             cipher.start()
             cipherResultText = '<h3>Available ciphers:</h3>' + \
                 '<ul><li>' + res.printResult('cipher_NULL') + '</li>' + \
@@ -233,84 +244,84 @@ class BurpExtender(IBurpExtender, ITab):
             
 
             setScanStatusLabel("Checking for Heartbleed")
-            heartbleed = heartbleed_test.HeartbleedTest(res, host, port)
+            heartbleed = heartbleed_test.HeartbleedTest(res, host, port, scanSpeed, scanAccuracy)
             heartbleed.start()
             heartbleedResultText = res.printResult('heartbleed')
             updateResultText(heartbleedResultText)
             
 
             setScanStatusLabel("Checking for CCS Injection")
-            ccs = ccs_test.CCSTest(res, host, port)
+            ccs = ccs_test.CCSTest(res, host, port, scanSpeed, scanAccuracy)
             ccs.start()
             ccsResultText = res.printResult('ccs_injection')
             updateResultText(ccsResultText)
 
             
             setScanStatusLabel("Checking for TLS_FALLBACK_SCSV")
-            fallback = fallback_test.FallbackTest(res, host, port)
+            fallback = fallback_test.FallbackTest(res, host, port, scanSpeed, scanAccuracy)
             fallback.start()
             fallbackResultText = res.printResult('fallback_support')
             updateResultText(fallbackResultText)
 
 
             setScanStatusLabel("Checking for POODLE (SSLv3)")
-            poodle = poodle_test.PoodleTest(res, host, port)
+            poodle = poodle_test.PoodleTest(res, host, port, scanSpeed, scanAccuracy)
             poodle.start()
             poodleResultText = res.printResult('poodle_ssl3')
             updateResultText(poodleResultText)
             
 
             setScanStatusLabel("Checking for SWEET32")
-            sweet32 = sweet32_test.Sweet32Test(res, host, port)
+            sweet32 = sweet32_test.Sweet32Test(res, host, port, scanSpeed, scanAccuracy)
             sweet32.start()
             sweet32ResultText = res.printResult('sweet32')
             updateResultText(sweet32ResultText)
             
 
             setScanStatusLabel("Checking for DROWN")
-            drown = drown_test.DrownTest(res, host, port)
+            drown = drown_test.DrownTest(res, host, port, scanSpeed, scanAccuracy)
             drown.start()
             drownResultText = res.printResult('drown')
             updateResultText(drownResultText)
             
 
             setScanStatusLabel("Checking for FREAK")
-            freak = freak_test.FreakTest(res, host, port)
+            freak = freak_test.FreakTest(res, host, port, scanSpeed, scanAccuracy)
             freak.start()
             freakResultText = res.printResult('freak')
             updateResultText(freakResultText)
             
 
             setScanStatusLabel("Checking for LUCKY13")
-            lucky13 = lucky13_test.Lucky13Test(res, host, port)
+            lucky13 = lucky13_test.Lucky13Test(res, host, port, scanSpeed, scanAccuracy)
             lucky13.start()
             lucky13ResultText = res.printResult('lucky13')
             updateResultText(lucky13ResultText)
             
 
             setScanStatusLabel("Checking for CRIME")
-            crime = crime_test.CrimeTest(res, host, port)
+            crime = crime_test.CrimeTest(res, host, port, scanSpeed, scanAccuracy)
             crime.start()
             crimeResultText = res.printResult('crime_tls')
             updateResultText(crimeResultText)
             
 
             setScanStatusLabel("Checking for BREACH")
-            breach = breach_test.BreachTest(res, host, 443)
+            breach = breach_test.BreachTest(res, host, port, scanSpeed, scanAccuracy)
             breach.start(self._callbacks, self._helpers)
             breachResultText = res.printResult('breach')
             updateResultText(breachResultText)
 
 
             setScanStatusLabel("Checking for BEAST")
-            beast = beast_test.BeastTest(res, host, port)
+            beast = beast_test.BeastTest(res, host, port, scanSpeed, scanAccuracy)
             beast.start()
             beastResultText = res.printResult('beast')
             updateResultText(beastResultText)
 
 
             setScanStatusLabel("Checking for LOGJAM")
-            logjam = logjam_test.LogjamTest(res, host, port)
+            logjam = logjam_test.LogjamTest(res, host, port, scanSpeed, scanAccuracy)
             logjam.start()
             logjamResultText = res.printResult('logjam_export') + '<br />' + res.printResult('logjam_common') 
             updateResultText(logjamResultText)

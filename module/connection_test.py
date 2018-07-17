@@ -1,6 +1,6 @@
 import socket
 import os
-from util import tryHandshake, modifyHelloVersion, addNecessaryExtensionToHello, sendData
+from util import *
 
 # SSLv2 spec
 # 0x80
@@ -67,12 +67,7 @@ def test_tls12(host, port) :
      return tryHandshake(host, port, addNecessaryExtensionToHello(tls12_hello, host)) == 3
 
 
-class ConnectionTest :
-    def __init__(self, result, host, port) :
-        self._result = result
-        self._host = host
-        self._port = port
-    
+class ConnectionTest(Test) :
     def start(self) :
         self._result.addResult('offer_ssl2',test_sslv2(self._host,self._port))
         if self._result.getResult('offer_ssl2') :

@@ -2,11 +2,8 @@ from util import *
 from TLS_protocol import ClientHello, intToHex
 import copy
 
-class SupportedCipherTest :
-    def __init__(self, result, host, port) :
-        self._result = result
-        self._host = host
-        self._port = port
+class SupportedCipherTest(Test) :
+    def init(self) :
         self.supportedCipherSuites = {}
         self.supportedCipherSuites['SSLv2.0'] = []
         self.supportedCipherSuites['SSLv3.0'] = []

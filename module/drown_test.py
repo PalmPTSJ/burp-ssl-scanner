@@ -1,13 +1,8 @@
 
-from util import tryHandshake, getHighestTLSVersion, modifyHelloVersion, sendData
+from util import *
 import connection_test
 
-class DrownTest :
-    def __init__(self, result, host, port) :
-        self._result = result
-        self._host = host
-        self._port = port
-    
+class DrownTest(Test) :
     def start(self) :
         # Connect using SSLv2
         if self._result.getResult('offer_ssl2') :

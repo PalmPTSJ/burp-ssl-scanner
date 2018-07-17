@@ -6,12 +6,7 @@ freak_hello = '16030100920100008e030354511e7adeadbeef3133070000000000cfbd3904cc1
 freak_hello_ssl2 = '801f0100020006000000100400800200802922beb35a018b04fe5f8003a013ebc4'
 
 
-class FreakTest :
-    def __init__(self, result, host, port) :
-        self._result = result
-        self._host = host
-        self._port = port
-    
+class FreakTest(Test) :
     def start(self) :
         # For every version
         vuln = False

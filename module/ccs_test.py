@@ -29,7 +29,7 @@ import sys
 import socket
 import time
 import struct
-from util import getSupportedTLSVersion, addNecessaryExtensionToHello
+from util import *
 #Module
 dSSL = {
     "SSLv3" : "\x03\x00",
@@ -493,12 +493,7 @@ def test_ccs(strHost, iPort, strVer):
         pass
     return False
 
-class CCSTest :
-    def __init__(self, result, host, port) :
-        self._result = result
-        self._host = host
-        self._port = port
-    
+class CCSTest(Test) :
     def start(self) :
         vuln = False
         for version in getSupportedTLSVersion(self._result) :
