@@ -61,7 +61,7 @@ class Result :
                 cipher['vulnerabilities'].append(vuln)
                 if not (vuln in self._resultDict['ciphers_by_vulns']):
                     self._resultDict['ciphers_by_vulns'][vuln] = []
-                self._resultDict['ciphers_by_vulns'][vuln].append(cipher['name'] + ("(%s)" % versionString))
+                self._resultDict['ciphers_by_vulns'][vuln].append(cipher['name'] + (" (%s)" % versionString))
                 break
 
     def printCipherList(self) :
@@ -92,7 +92,7 @@ class Result :
             resultList = ""
             for vuln in self._resultDict['ciphers_by_vulns']:
                 resultList += "<b>" + vuln + "</b><br /><ul>"
-                for cipher in self._resultDict['ciphers_by_vulns'][vuln]:
+                for cipher in sorted(self._resultDict['ciphers_by_vulns'][vuln]):
                     resultList += "<li>%s</li>" % cipher
                 resultList += "</ul>"
             return resultList
