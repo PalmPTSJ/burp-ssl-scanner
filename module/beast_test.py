@@ -12,21 +12,23 @@ class BeastTest :
     def start(self) :
         version = getHighestTLSVersion(self._result)
         
-        vuln = False
+        vuln = 0 # Not vulnerable
         for version in [0,1] :
             if isTLSVersionSupport(self._result, version) :
-                print("[BEAST] Version %d supported, testing" % version)
                 hello = ClientHello()
                 hello.ciphersuite = cbc_cipher
                 hello.version = version
                 hello = addNecessaryExtensionToHelloObject(hello, self._host)
                 if tryHandshake(self._host, self._port, hello.createAsHex()) == version :
-                    # BEAST
-                    print("[BEAST] Handshake success with version %d" % version)
-                    vuln = True
+                    # Vulnerable
+                    print("[BEAST] Vulnerable, handshake success with version %d" % version)
+                    vuln = 1
         
+        if getHighestTLSVersion(self._result) <= 1 and vuln == 1 :
+            vuln = 2 # TLS1.0 is highest protocol
+
         self._result.addResult('beast', vuln)
-        if vuln :
+        if vuln == 2 :
             self._result.addVulnerability('beast')
             for cipherHex in splitCipherHexStringTLS(cbc_cipher) :
                 for supportedVersion in getSupportedTLSVersion(self._result) :

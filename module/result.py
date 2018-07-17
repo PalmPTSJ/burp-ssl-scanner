@@ -12,8 +12,7 @@ class Result :
         self.callbacks = callbacks
         self.helpers = helpers
         self.addToSitemap = addToSitemap
-        self.issueList = [] # Issue list as string (HTML)
-        self.sslIssueList = [] # Issue list as SSLIssue to return to Burp scanner
+        self.issueList = [] # Issue list
 
     def addVulnerability(self, issueKey, additionalInfo = None) :
         print "TEST FOUND: [%s] - %s" % (issueKey, additionalInfo)
@@ -23,8 +22,7 @@ class Result :
         if not (additionalInfo is None):
             issue.setIssueDetail(additionalInfo)
 
-        self.sslIssueList.append(issue)
-        self.issueList.append('<li>[%s] %s</li>' % (issue.getSeverity(), issue.getIssueName().replace('[SSL Scanner] ','')))
+        self.issueList.append(issue)
 
         # Add to Burp issue
         if self.addToSitemap  :
@@ -43,11 +41,11 @@ class Result :
                         ScannerRunnable(self.callbacks.addScanIssue, (issue, ))
                 )
 
-    def getAllSSLIssue(self) :
-        return self.sslIssueList
+    def getAllIssue(self) :
+        return self.issueList
 
     def printAllIssue(self) :
-        return  '<ul>' + ''.join(self.issueList) + '</ul>'
+        return  '<ul>' + ''.join(['<li>[%s] %s</li>' % (issue.getSeverity(), issue.getIssueName().replace('[SSL Scanner] ','')) for issue in self.getAllIssue()]) + '</ul>'
 
     def printResult(self, field) :
         try:

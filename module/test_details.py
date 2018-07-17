@@ -6,7 +6,7 @@ POSSIBLE_TESTS = {
     'test_keyword': {
         'internalType' -> a unique number for the test
         'name' -> the name of the test
-        'result' -> the descriptions for the test results (in the form of [False, True])
+        'result' -> the descriptions for the test results (in the form of [False (0), True (1), others...(2, 3, 4, ...)] )
         'severity' -> the severity of the issue (High/Medium/Low/Information/False positive)
         'confidence' -> the issue confidence level (Certain/Firm/Tentative)
         'issueBackground' -> the background information for the issue (nullable)
@@ -290,7 +290,10 @@ POSSIBLE_TESTS = {
     'beast' : {
         'internalType': 24,
         'name': 'BEAST',
-        'result': ['<b style="color: green;">Not vulnerable</b>', '<b style="color: red;">Vulnerable</b>'],
+        'result': [
+            '<b style="color: green;">Not vulnerable</b>', 
+            '<b style="color: green;">Vulnerable (but also supports higher protocols, likely mitigated)</b>', 
+            '<b style="color: red;">Vulnerable</b>'],
         'severity': 'Medium',
         'confidence': 'Tentative',
         'issueBackground': \

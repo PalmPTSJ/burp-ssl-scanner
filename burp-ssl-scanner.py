@@ -332,7 +332,7 @@ class BurpExtender(IBurpExtender, ITab):
             time.sleep(2)
 
         if usingBurpScanner :
-            return res.getAllSSLIssue()
+            return res.getAllIssue()
         else :
             self.scanningEvent.clear()
             SwingUtilities.invokeLater(
