@@ -142,10 +142,11 @@ class BurpExtender(IBurpExtender, ITab):
         print "SSL Scanner check registered"
 
         projectConfig = json.loads(self._callbacks.saveConfigAsJson())
-        scanAccuracy = projectConfig['scanner']['active_scanning_optimization']['scan_accuracy']
-        scanSpeed = projectConfig['scanner']['active_scanning_optimization']['scan_speed']
+        if 'scanner' in projectConfig:
+            scanAccuracy = projectConfig['scanner']['active_scanning_optimization']['scan_accuracy']
+            scanSpeed = projectConfig['scanner']['active_scanning_optimization']['scan_speed']
 
-        print(scanAccuracy, scanSpeed)
+            print(scanAccuracy, scanSpeed)
 
         self.scannedHost = []
 
@@ -200,10 +201,14 @@ class BurpExtender(IBurpExtender, ITab):
 
         ### Get project configuration
         projectConfig = json.loads(self._callbacks.saveConfigAsJson())
-        # scanAccuracy: minimise_false_negatives, normal, minimise_false_positives
-        scanAccuracy = projectConfig['scanner']['active_scanning_optimization']['scan_accuracy']
-        # scanSpeed: fast, normal, thorough
-        scanSpeed = projectConfig['scanner']['active_scanning_optimization']['scan_speed']
+        if 'scanner' in projectConfig:
+            # scanAccuracy: minimise_false_negatives, normal, minimise_false_positives
+            scanAccuracy = projectConfig['scanner']['active_scanning_optimization']['scan_accuracy']
+            # scanSpeed: fast, normal, thorough
+            scanSpeed = projectConfig['scanner']['active_scanning_optimization']['scan_speed']
+        else:
+            scanAccuracy = 'normal'
+            scanSpeed = 'normal'
 
         updateResultText('<h2>Scanning speed: %s</h2> %s' % (scanSpeed, test_details.SCANNING_SPEED_INFO[scanSpeed]))
         updateResultText('<h2>Scanning accuracy: %s</h2> %s' % (scanAccuracy, test_details.SCANNING_ACCURACY_INFO[scanAccuracy]))
