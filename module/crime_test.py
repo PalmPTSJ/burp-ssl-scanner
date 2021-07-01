@@ -1,3 +1,4 @@
+import connection_test
 from util import *
 from TLS_protocol import ClientHello
 
@@ -13,6 +14,8 @@ class CrimeTest(Test) :
             hello = ClientHello()
             hello.compression = '0100' # DEFLATE & null
             hello.version = version
+            if version == 3: #To cover all cases when TLS 1.2 fails on standard ciphers
+                hello.ciphersuite = connection_test.tls12_ciphersuites
             hello = addNecessaryExtensionToHelloObject(hello, self._host)
             hellohex = hello.createAsHex()
 
